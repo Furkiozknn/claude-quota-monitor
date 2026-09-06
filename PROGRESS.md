@@ -13,20 +13,33 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **Testler** — `normalize()` için gerçek şema örnekleriyle birim testler.
-   Şema değişirse hemen anlaşılsın.
-2. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
+1. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
    gerekirse düzelt. Yüksek kontrast modu ekle.
-3. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
-4. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-5. **Çoklu görünüm** — anlık / günlük / aylık.
-6. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-7. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+2. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
+3. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
+4. **Çoklu görünüm** — anlık / günlük / aylık.
+5. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+6. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
 
 ---
 
 ## Tamamlananlar
+
+### v0.8.0 — Birim testler · 7 Eylül, gece
+- `tests/test_normalize.py` — 15 test, bağımlılık yok, hepsi geçiyor.
+- **Fixture gerçek bir uç yanıtı.** Belgelenmemiş bir uca bağlıyız; şema
+  değişirse veya ayrıştırıcı bozulursa burada yakalanır.
+- Kapsanan: `limits` dizisinden kart üretimi, kod adı gürültüsünün elenmesi
+  (`nimbus_quill`, `tangelo`, `cinder_cove`, `spend`), severity'nin uçtan
+  alınması, aktif limitin başa gelmesi, scope modelinin etikete girmesi,
+  yedek yol, düzleştirilmiş şema, yüzde ölçekleme (%1'in %100 olmaması),
+  epoch/ISO/ms tarih dönüşümleri, bozuk girdiye dayanıklılık.
+- README'ye çalıştırma talimatı eklendi.
+
+**Gözlem:** Bu turda 5 saatlik pencere sıfırlandı (%0). Haftalık %87'den
+sıfırlanmak üzereydi. Geçen turdaki "sabaha %100'e ulaşır" endişesi
+gerçekleşmedi — pencereler gece sıfırlanıyor.
 
 ### v0.7.0 — Eşik bildirimi · 7 Eylül, gece
 - `notify.py` — **bağımlılıksız** Windows bildirimi. `win10toast`/`plyer`

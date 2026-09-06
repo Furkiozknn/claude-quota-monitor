@@ -100,6 +100,18 @@ bilgisi bulunamadı. Betiklerden kullanışlı.
 - **Ham veri** — uçtan gelen JSON, olduğu gibi.
 - **Tanılama** — HTTP durumu, son deneme, backoff durumu, politika özeti.
 
+## Testler
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+15 test, bağımlılık yok. `tests/test_normalize.py` gerçek bir uç yanıtının
+kopyasını fixture olarak tutuyor — şema değişirse veya ayrıştırıcı bozulursa
+burada yakalanır. Kapsam: `limits` dizisinden kart üretimi, kod adı
+gürültüsünün elenmesi, yedek yol, düzleştirilmiş şema, yüzde/tarih
+dönüşümleri, bozuk girdiye dayanıklılık.
+
 ## Ham veri sekmesi neden var
 
 `/api/oauth/usage` **belgelenmemiş** bir uç. Anthropic'in genel API
