@@ -76,3 +76,11 @@ Her tur en üstteki yapılabilir maddeyi al.
   değiştirebilir. Yedek ayrıştırıcı ve Ham veri sekmesi bu yüzden var.
 - Yanma hızı en az ~5 dakikalık kesintisiz örnekleme ister; sunucu sık
   yeniden başlatılırsa "veri birikiyor" der.
+
+### 6 Eylül 2026 — v0.4.1 · Paylaşıma hazırlık başlangıcı
+- `git init` + ilk commit (`4341cd1`), 8 dosya / 1946 satır.
+- `.gitignore` eklendi (`*.db`, `__pycache__`).
+- Widget masaüstünde doğrulandı (PID 6880, "Claude Kota").
+- **Not:** Kullanıcının otomasyonu aynı gece günlük 8 USD maliyet tavanına
+  takıldı. Tavanı yükseltmedim — `raporlar/ONAY-BEKLEYENLER.md` madde 3'te
+  kararına bırakıldı. Döngü temkinli tempoda (30 dk ara) kuruldu.
