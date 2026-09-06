@@ -13,21 +13,39 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **Eşik bildirimi** — %90'ı geçince Windows bildirimi (stdlib ile).
-2. **Testler** — `normalize()` için gerçek şema örnekleriyle birim testler.
+1. **Testler** — `normalize()` için gerçek şema örnekleriyle birim testler.
    Şema değişirse hemen anlaşılsın.
-3. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
+2. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
    gerekirse düzelt. Yüksek kontrast modu ekle.
-4. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
-5. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-6. **Çoklu görünüm** — anlık / günlük / aylık.
-7. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-8. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+3. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
+4. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
+5. **Çoklu görünüm** — anlık / günlük / aylık.
+6. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+7. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
 
 ---
 
 ## Tamamlananlar
+
+### v0.7.0 — Eşik bildirimi · 7 Eylül, gece
+- `notify.py` — **bağımlılıksız** Windows bildirimi. `win10toast`/`plyer`
+  kullanılmadı; projenin sıfır bağımlılık sözü bildirim için de geçerli.
+  PowerShell üzerinden WinRT toast, olmazsa NotifyIcon balonu.
+- PowerShell'e script stdin'den veriliyor — tırnak/ters bölü kaçışıyla
+  uğraşılmıyor (bu makinede bilinen bir tuzak).
+- `--notify-at` bayrağı, varsayılan %90, `0` = kapalı.
+- **Gece yarısı inceliği:** ilk başarılı sorguda bildirim atılmaz, yalnızca
+  mevcut durum kaydedilir (`_seeded`). Yoksa program her açıldığında zaten
+  dolu olan pencereler için bildirim yağardı.
+- Pencere başına tek bildirim; sıfırlanıp yüzde 5 puan altına düşünce
+  yeniden hak kazanır — eşiğin tam üstünde salınan değer bildirim yağmuru
+  yaratmasın diye.
+- Gönderim ayrı iş parçacığında; PowerShell birkaç saniye sürebiliyor,
+  poller beklemesin.
+
+Doğrulandı: gerçek bildirim gönderildi (WinRT yolu, çıkış kodu 0).
+Görsel olarak doğrulanamadı — ekran görülemiyor.
 
 ### v0.6.0 — Terminal çıktısı · 7 Eylül, gece
 - `--once` (okunakli özet) ve `--compact` (tek satır, statusline için).

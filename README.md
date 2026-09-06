@@ -62,6 +62,7 @@ Pano `http://127.0.0.1:8110` adresinde açılır.
 | `--port` | `8110` | Dinlenecek port (`PORT` değişkeni de olur) |
 | `--interval` | `180` | Sorgu aralığı (sn), alt sınır 60 |
 | `--db` | `~/.claude/quota-monitor.db` | Geçmiş veritabanı |
+| `--notify-at` | `90` | Bu yüzde aşılınca Windows bildirimi. `0` = kapalı |
 | `--no-browser` | — | Tarayıcıyı otomatik açma |
 | `--host` | `127.0.0.1` | Değiştirmen önerilmez |
 

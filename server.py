@@ -468,10 +468,19 @@ class Poller(threading.Thread):
 
     daemon = True
 
-    def __init__(self, conn: sqlite3.Connection, interval: int = POLL_INTERVAL):
+    def __init__(self, conn: sqlite3.Connection, interval: int = POLL_INTERVAL,
+                 notify_at: int = 0):
         super().__init__(name="poller")
         self.conn = conn
         self.interval = interval
+        self.notify_at = notify_at
+        # Hangi pencere icin esik bildirimi zaten atildi. Pencere sifirlaninca
+        # temizlenir ki bir sonraki dolusta yeniden haber verilsin.
+        self._notified: dict[str, bool] = {}
+        # Ilk basarili sorguda bildirim ATILMAZ, yalnizca mevcut durum
+        # kaydedilir. Yoksa program her acildiginda zaten dolu olan pencereler
+        # icin bildirim yagardi — gece yarisi hos olmaz.
+        self._seeded = False
         self.backoff = 0
         self.lock = threading.Lock()
         self.state: dict = {
@@ -505,6 +514,58 @@ class Poller(threading.Thread):
             self._wake.wait(timeout=wait)
             self._wake.clear()
 
+    def _check_thresholds(self, cards: list[dict]) -> None:
+        """Esik asildiginda bir kez bildirim gonderir.
+
+        Kurallar:
+        * Ilk basarili sorguda hicbir sey gonderilmez (bkz. _seeded).
+        * Pencere basina tek bildirim; pencere sifirlanip yuzde belirgin
+          sekilde dusunce yeniden hak kazanir.
+        * Gonderim ayri bir is parcaciginda — PowerShell birkac saniye
+          surebiliyor, poller onu beklemesin.
+        """
+        if not self.notify_at:
+            return
+
+        for card in cards:
+            key, pct = card.get("key"), card.get("percent")
+            if not key or pct is None:
+                continue
+
+            crossed = pct >= self.notify_at
+            already = self._notified.get(key, False)
+
+            if crossed and not already:
+                self._notified[key] = True
+                if self._seeded:
+                    threading.Thread(
+                        target=self._send_notice, args=(card,), daemon=True
+                    ).start()
+            elif already and pct < self.notify_at - 5:
+                # Belirgin dusus = pencere sifirlandi. 5 puanlik pay,
+                # esigin tam ustunde salinan degerlerin bildirim yagmuru
+                # yaratmasini onler.
+                self._notified[key] = False
+
+        self._seeded = True
+
+    def _send_notice(self, card: dict) -> None:
+        try:
+            from notify import notify as send
+        except Exception:
+            return
+        left = ""
+        if card.get("resets_at"):
+            secs = int(card["resets_at"] - time.time())
+            if secs > 0:
+                h, m = secs // 3600, (secs % 3600) // 60
+                left = f" Sifirlanmasina {h} sa {m} dk."
+        try:
+            send(f"Claude kota: {card['label']}",
+                 f"%{card['percent']:.0f} doldu.{left}")
+        except Exception:
+            pass
+
     def _tick(self) -> None:
         token, meta = read_token()
         now = time.time()
@@ -528,6 +589,7 @@ class Poller(threading.Thread):
         if status == 200:
             cards = normalize(body)
             store(self.conn, cards)
+            self._check_thresholds(cards)
             self.backoff = 0
             with self.lock:
                 self.state.update(
@@ -745,6 +807,9 @@ def main() -> int:
                              "Daha kisasi ucun limitine carpar.")
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--no-browser", action="store_true")
+    parser.add_argument("--notify-at", type=int, default=90, metavar="YUZDE",
+                        help="Bu yuzde asilinca Windows bildirimi gonder. "
+                             "0 = kapali. Varsayilan 90.")
     args = parser.parse_args()
 
     # Tek seferlik mod: sunucu baslatmaz, veritabani acmaz, hemen cikar.
@@ -760,7 +825,7 @@ def main() -> int:
               "bilgin var; ag uzerinden erisilebilir hale gelir.")
 
     conn = init_db(args.db)
-    poller = Poller(conn, interval=args.interval)
+    poller = Poller(conn, interval=args.interval, notify_at=args.notify_at)
     poller.start()
 
     httpd = ThreadingHTTPServer((args.host, args.port), make_handler(poller, conn))
@@ -769,6 +834,7 @@ def main() -> int:
     print(f"{APP_NAME} {APP_VERSION}")
     print(f"  Pano      : {url}")
     print(f"  Sorgu     : {args.interval} sn'de bir (backoff max {BACKOFF_MAX} sn)")
+    print(f"  Bildirim  : " + (f"%{args.notify_at} ustunde" if args.notify_at else "kapali"))
     print(f"  Gecmis    : {args.db}")
     print(f"  Kimlik    : {CREDENTIALS} (yalnizca okunur)")
     print("  Token rotasyonu YAPILMAZ. Ctrl+C ile durdurulur.")
