@@ -3,6 +3,12 @@
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
+// Kart etiketleri belgelenmemis bir uctan geliyor ve innerHTML'e basiliyor.
+// Ucun bugun markup dondurmemesi yarin dondurmeyecegi anlamina gelmez.
+const esc = (v) => String(v ?? "")
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
 // Sunucudan gelen son durum. Geri sayimlar bunun uzerinden yerel olarak isler,
 // yani her saniye sunucuya gitmeyiz.
 let state = null;
@@ -32,12 +38,39 @@ function initTheme() {
 /* ---------------- sekmeler ---------------- */
 
 function initTabs() {
-  $$(".tab").forEach((tab) => {
-    tab.addEventListener("click", () => {
-      $$(".tab").forEach((t) => t.classList.toggle("active", t === tab));
-      const name = tab.dataset.tab;
-      $$(".panel").forEach((p) => { p.hidden = p.id !== `panel-${name}`; });
-      if (name === "history") { loadHistory(); }
+  const tabs = $$(".tab");
+
+  function select(tab, focus = false) {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.classList.toggle("active", on);
+      t.setAttribute("aria-selected", String(on));
+      // Roving tabindex: sekme serisi tek Tab duragi olur, iceride ok tuslari gezer.
+      t.tabIndex = on ? 0 : -1;
+    });
+    const name = tab.dataset.tab;
+    $$(".panel").forEach((p) => { p.hidden = p.id !== `panel-${name}`; });
+    if (name === "history") loadHistory();
+    if (focus) tab.focus();
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-controls", `panel-${tab.dataset.tab}`);
+    tab.setAttribute("aria-selected", String(tab.classList.contains("active")));
+    tab.tabIndex = tab.classList.contains("active") ? 0 : -1;
+
+    tab.addEventListener("click", () => select(tab));
+    tab.addEventListener("keydown", (e) => {
+      const map = { ArrowRight: 1, ArrowLeft: -1, Home: "first", End: "last" };
+      const move = map[e.key];
+      if (move === undefined) return;
+      e.preventDefault();
+      let next;
+      if (move === "first") next = tabs[0];
+      else if (move === "last") next = tabs[tabs.length - 1];
+      else next = tabs[(i + move + tabs.length) % tabs.length];
+      select(next, true);
     });
   });
 }
@@ -121,9 +154,20 @@ function renderCards() {
     const cd = fmtCountdown(card.resets_at);
     const level = levelOf(card);
 
+    // WCAG: durum yalnizca renkle anlatilmaz — simge + metin de var.
+    const sevInfo = {
+      ok:     { icon: "●", text: "normal" },
+      warn:   { icon: "▲", text: "dikkat" },
+      danger: { icon: "■", text: "kritik" },
+    }[level] || { icon: "○", text: "bilinmiyor" };
+
+    const sevTag =
+      `<span class="tag tag-${level}"><span aria-hidden="true">${sevInfo.icon}</span> ${sevInfo.text}</span>`;
+
     // is_active = su an seni fiilen daraltan limit bu
     const activeTag = card.is_active
-      ? `<span class="tag tag-${level}">şu an bu sınırlıyor</span>` : "";
+      ? `<span class="tag tag-active"><span aria-hidden="true">▶</span> şu an bu sınırlıyor</span>`
+      : "";
 
     // Yanma hizi: asil soru "pencere sifirlanmadan once dolar miyim?"
     let burnLine = "";
@@ -139,19 +183,27 @@ function renderCards() {
       }
     }
 
+    const pctAria = pct == null ? "bilinmiyor" : pct.toFixed(0);
+    const aria = `${esc(card.label)}: yüzde ${pctAria}, durum ${sevInfo.text}`;
+
     return `
-      <div class="card ${card.is_active ? "is-active" : ""}">
-        <div class="ring">
+      <div class="card ${card.is_active ? "is-active" : ""}" role="group" aria-label="${aria}">
+        <div class="ring" aria-hidden="true">
           ${ringSvg(card)}
           <div class="val">${pctText}</div>
         </div>
         <div class="card-body">
-          <div class="card-label" title="${card.key}">${card.label}</div>
+          <div class="card-label" title="${esc(card.key)}">${esc(card.label)}</div>
+          <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+               aria-valuenow="${pct == null ? 0 : pct.toFixed(0)}"
+               aria-label="${esc(card.label)} doluluk">
+            <span class="bar-fill lvl-${level}" style="width:${Math.max(0, Math.min(100, pct || 0))}%"></span>
+          </div>
           <div class="card-reset">
             ${cd ? `sıfırlanmasına <b class="cd">${cd}</b>` : "sıfırlanma bilgisi yok"}
           </div>
           ${burnLine}
-          ${activeTag}
+          <div class="tags">${sevTag}${activeTag}</div>
         </div>
       </div>`;
   }).join("");
@@ -345,7 +397,7 @@ function drawChart() {
 
   $("#legend").innerHTML = keys.map((k, i) => {
     const label = (state?.cards || []).find((c) => c.key === k)?.label || k;
-    return `<span><i style="background:${SERIES_COLORS[i % SERIES_COLORS.length]}"></i>${label}</span>`;
+    return `<span><i style="background:${SERIES_COLORS[i % SERIES_COLORS.length]}"></i>${esc(label)}</span>`;
   }).join("");
 }
 

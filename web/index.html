@@ -30,9 +30,9 @@
 
 <main>
   <!-- uyari seridi -->
-  <div id="notice" class="notice" hidden></div>
+  <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
 
-  <section id="panel-quotas" class="panel">
+  <section id="panel-quotas" class="panel" role="tabpanel" tabindex="0">
     <div id="cards" class="cards"></div>
     <div id="meta" class="meta" hidden></div>
     <p id="empty-hint" class="empty" hidden>
@@ -41,7 +41,7 @@
     </p>
   </section>
 
-  <section id="panel-history" class="panel" hidden>
+  <section id="panel-history" class="panel" role="tabpanel" tabindex="0" hidden>
     <div class="chart-head">
       <h2>Son 24 saat</h2>
       <div id="legend" class="legend"></div>
@@ -53,7 +53,7 @@
     </p>
   </section>
 
-  <section id="panel-raw" class="panel" hidden>
+  <section id="panel-raw" class="panel" role="tabpanel" tabindex="0" hidden>
     <div class="chart-head">
       <h2>Uçtan gelen ham JSON</h2>
       <button id="copy-raw" class="ghost">Kopyala</button>
@@ -66,7 +66,7 @@
     <pre id="raw"></pre>
   </section>
 
-  <section id="panel-diag" class="panel" hidden>
+  <section id="panel-diag" class="panel" role="tabpanel" tabindex="0" hidden>
     <h2>Tanılama</h2>
     <table class="diag" id="diag-table"></table>
 

@@ -163,6 +163,19 @@ main { padding: 22px; max-width: 1100px; margin: 0 auto; }
 /* su an fiilen daraltan limit one cikar */
 .card.is-active { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
 
+/* Dogrusal cubuk: halka guzel ama insan gozu duz cizgileri kiyaslamada
+   cok daha iyi. Kartlar ayni genislikte oldugu icin cubuklar hizali cikar. */
+.bar {
+  height: 6px; border-radius: 999px; background: var(--track);
+  overflow: hidden; margin: 7px 0 6px;
+}
+.bar-fill { display: block; height: 100%; border-radius: 999px; transition: width .4s ease; }
+.bar-fill.lvl-ok     { background: var(--accent); }
+.bar-fill.lvl-warn   { background: var(--warn); }
+.bar-fill.lvl-danger { background: var(--danger); }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+
 .burn {
   margin-top: 5px; font-size: 11.5px; color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
@@ -170,14 +183,25 @@ main { padding: 22px; max-width: 1100px; margin: 0 auto; }
 .burn.bad { color: var(--danger); }
 .burn b { font-weight: 650; }
 
+/* Durum rozeti: renk + simge + metin. Renk korlugunde de okunur,
+   ekran okuyucuda da metin olarak gecer. */
 .tag {
-  display: inline-block; margin-top: 7px;
+  display: inline-flex; align-items: center; gap: 4px;
   font-size: 11px; font-weight: 600; letter-spacing: .01em;
-  padding: 2px 8px; border-radius: 999px;
+  padding: 2px 8px; border-radius: 999px; white-space: nowrap;
 }
 .tag-ok     { background: color-mix(in srgb, var(--ok) 16%, transparent);     color: var(--ok); }
-.tag-warn   { background: color-mix(in srgb, var(--warn) 18%, transparent);   color: var(--warn); }
-.tag-danger { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+.tag-warn   { background: color-mix(in srgb, var(--warn) 20%, transparent);   color: var(--warn); }
+.tag-danger { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.tag-active {
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+  color: var(--fg); border: 1px solid var(--border);
+}
+
+/* Klavye gezinmesi gorunur olmali */
+:where(button, [role="tab"], a):focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+}
 
 .meta {
   margin-top: 14px; padding: 11px 14px;
