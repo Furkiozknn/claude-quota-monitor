@@ -637,8 +637,106 @@ def make_handler(poller: Poller, conn: sqlite3.Connection):
 
 # --------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------
+# Tek seferlik terminal ciktisi
+# --------------------------------------------------------------------------
+
+SHORT = {
+    "session": "5s", "weekly_all": "7g", "weekly_scoped": "kaps",
+    "five_hour": "5s", "seven_day": "7g",
+}
+SEV_MARK = {"critical": "!", "warning": "*", "normal": ""}
+SEV_WORD = {"critical": "KRITIK", "warning": "dikkat", "normal": "normal"}
+
+
+def _short_name(card: dict) -> str:
+    key = str(card.get("key", ""))
+    if ":" in key:                      # weekly_scoped:Fable -> model adi
+        return key.split(":", 1)[1]
+    return SHORT.get(key, key[:6])
+
+
+def _from_local_server(port: int) -> dict | None:
+    """Calisan sunucu varsa ondan oku — boylece uca EK sorgu gitmez."""
+    try:
+        with urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/api/status", timeout=3
+        ) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data if data.get("last_ok") else None
+    except Exception:
+        return None
+
+
+def _bar(pct: float, width: int = 10) -> str:
+    filled = int(round(min(100.0, max(0.0, pct)) / 100.0 * width))
+    return "#" * filled + "." * (width - filled)
+
+
+def _fmt_left(epoch: float | None) -> str:
+    if not epoch:
+        return "-"
+    secs = int(epoch - time.time())
+    if secs <= 0:
+        return "simdi"
+    h, m = secs // 3600, (secs % 3600) // 60
+    if h >= 24:
+        return f"{h // 24}g{h % 24}s"
+    return f"{h}s{m:02d}dk" if h else f"{m}dk"
+
+
+def one_shot(port: int, compact: bool) -> int:
+    """Tarayici acmadan durumu yazdirir ve cikar.
+
+    Once calisan sunucuya bakar (ek sorgu yok). Yoksa tek bir dogrudan
+    sorgu yapar — yine rotasyon yok, tekrar denemesi yok.
+    """
+    data = _from_local_server(port)
+    source = "yerel sunucu"
+
+    if data is None:
+        token, meta = read_token()
+        if not token:
+            print(meta.get("error", "Token okunamadi"), file=sys.stderr)
+            return 2
+        status, body = fetch_usage(token)
+        if status != 200:
+            print(f"Uc HTTP {status} dondu.", file=sys.stderr)
+            return 3
+        data = {"cards": normalize(body), "subscription": meta.get("subscription")}
+        source = "dogrudan uc"
+
+    cards = [c for c in (data.get("cards") or []) if c.get("percent") is not None]
+    if not cards:
+        print("Kota bilgisi bulunamadi.", file=sys.stderr)
+        return 4
+
+    if compact:
+        parts = []
+        for card in cards:
+            sev = str(card.get("severity") or "").lower()
+            parts.append(f"{_short_name(card)} {card['percent']:.0f}%{SEV_MARK.get(sev, '')}")
+        print(" | ".join(parts))
+        return 0
+
+    plan = data.get("subscription") or "?"
+    print(f"Claude kota — {plan}")
+    for card in cards:
+        sev = str(card.get("severity") or "").lower()
+        mark = " <" if card.get("is_active") else "  "
+        print(f"  {card['label'][:30]:<30} [{_bar(card['percent'])}] "
+              f"{card['percent']:>3.0f}%  {SEV_WORD.get(sev, sev or '-'):<7}"
+              f" sifir: {_fmt_left(card.get('resets_at')):<8}{mark}")
+    print(f"  kaynak: {source}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Claude kota panosu (yerel)")
+    parser.add_argument("--once", action="store_true",
+                        help="Sunucu baslatma; durumu yazdir ve cik")
+    parser.add_argument("--compact", action="store_true",
+                        help="Tek satir cikti (statusline icin). --once ima eder")
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8110")))
     parser.add_argument("--host", default="127.0.0.1",
                         help="Varsayilan 127.0.0.1. Degistirmeni onermem.")
@@ -648,6 +746,10 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args()
+
+    # Tek seferlik mod: sunucu baslatmaz, veritabani acmaz, hemen cikar.
+    if args.once or args.compact:
+        return one_shot(args.port, args.compact)
 
     if args.interval < 60:
         print("[!] Aralik 60 sn'nin altina indirilemez (nazik olma politikasi). 60 kullaniliyor.")

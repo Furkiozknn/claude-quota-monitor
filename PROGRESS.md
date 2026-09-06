@@ -13,23 +13,32 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **`--once` / `--compact` terminal çıktısı** — tarayıcı açmadan tek satır
-   durum. Kullanıcının asıl derdi ekran yeriydi.
-2. **Eşik bildirimi** — %90'ı geçince Windows bildirimi (stdlib ile).
-3. **Testler** — `normalize()` için gerçek şema örnekleriyle birim testler.
+1. **Eşik bildirimi** — %90'ı geçince Windows bildirimi (stdlib ile).
+2. **Testler** — `normalize()` için gerçek şema örnekleriyle birim testler.
    Şema değişirse hemen anlaşılsın.
-4. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
+3. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
    gerekirse düzelt. Yüksek kontrast modu ekle.
-5. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
-6. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-7. **Çoklu görünüm** — anlık / günlük / aylık.
-8. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-9. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+4. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
+5. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
+6. **Çoklu görünüm** — anlık / günlük / aylık.
+7. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+8. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
 
 ---
 
 ## Tamamlananlar
+
+### v0.6.0 — Terminal çıktısı · 7 Eylül, gece
+- `--once` (okunakli özet) ve `--compact` (tek satır, statusline için).
+  Sunucu başlatmaz, veritabanı açmaz, hemen çıkar.
+- **Nazik olma korundu:** önce çalışan sunucuya bakar, ondan okur — uca
+  **ek sorgu gitmez**. Sunucu kapalıysa tek bir doğrudan sorgu.
+- Simgeler: `!` kritik, `*` dikkat, `<` şu an sınırlayan limit.
+- Betiklerde kullanılsın diye anlamlı çıkış kodları (0/2/3/4).
+- README'ye örnek çıktılarla eklendi.
+
+Doğrulandı: her iki mod da gerçek veriyle çalıştı, çıkış kodu 0.
 
 ### v0.5.0 — Erişilebilirlik ve güvenlik geçişi · 6 Eylül, gece
 UI/UX araştırması yapıldı; üç somut eksik bulundu ve kapatıldı.

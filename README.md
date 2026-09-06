@@ -57,11 +57,38 @@ Pano `http://127.0.0.1:8110` adresinde açılır.
 
 | Bayrak | Varsayılan | Açıklama |
 |---|---|---|
+| `--once` | — | Sunucu başlatma, durumu yazdır ve çık |
+| `--compact` | — | Tek satır çıktı (statusline için). `--once` ima eder |
 | `--port` | `8110` | Dinlenecek port (`PORT` değişkeni de olur) |
 | `--interval` | `180` | Sorgu aralığı (sn), alt sınır 60 |
 | `--db` | `~/.claude/quota-monitor.db` | Geçmiş veritabanı |
 | `--no-browser` | — | Tarayıcıyı otomatik açma |
 | `--host` | `127.0.0.1` | Değiştirmen önerilmez |
+
+### Terminalden hızlı bakış
+
+Tarayıcı açmadan, hatta sunucu çalışmadan:
+
+```bash
+$ python server.py --once
+Claude kota — max
+  Haftalık — Kapsamlı · Fable    [##########] 100%  KRITIK  sifir: 1s44dk  <
+  Haftalık — Tüm modeller        [#########.]  86%  dikkat  sifir: 1s44dk
+  5 Saatlik Oturum               [#######...]  68%  normal  sifir: 1s24dk
+  kaynak: yerel sunucu
+
+$ python server.py --compact
+Fable 100%! | 7g 86%* | 5s 68%
+```
+
+`!` = kritik, `*` = dikkat, `<` = şu an seni fiilen sınırlayan limit.
+
+**Önemli:** Bu mod önce çalışan sunucuya bakar. Sunucu ayaktaysa ondan okur
+ve uca **ek sorgu gitmez** — nazik olma politikası korunur. Sunucu kapalıysa
+tek bir doğrudan sorgu yapar.
+
+Çıkış kodları: `0` başarılı, `2` token yok, `3` uç hata döndü, `4` kota
+bilgisi bulunamadı. Betiklerden kullanışlı.
 
 ## Arayüz
 
