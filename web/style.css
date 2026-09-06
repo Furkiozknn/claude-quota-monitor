@@ -1,0 +1,239 @@
+/* Claude Kota Panosu — tema degiskenleri acik modda tanimlanir,
+   koyu mod ve elle secim yalnizca onlari ezer. */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --border: #e2e5ea;
+  --fg: #1b1e23;
+  --fg-muted: #666e7a;
+  --accent: #c96442;
+  --ok: #2e9e5b;
+  --warn: #d98324;
+  --danger: #d64545;
+  --track: #e6e9ee;
+  --shadow: 0 1px 2px rgba(16, 20, 26, .06), 0 4px 16px rgba(16, 20, 26, .05);
+  --radius: 14px;
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #22262d;
+    --border: #2d323b;
+    --fg: #e6e8ec;
+    --fg-muted: #9aa3b0;
+    --track: #2b3038;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14161a;
+  --surface: #1c1f25;
+  --surface-2: #22262d;
+  --border: #2d323b;
+  --fg: #e6e8ec;
+  --fg-muted: #9aa3b0;
+  --track: #2b3038;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 17px; font-weight: 650; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 14px; font-weight: 650; margin: 0 0 12px; letter-spacing: -.01em; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+.muted { color: var(--fg-muted); }
+.small { font-size: 12px; }
+
+/* ---------- ust bar ---------- */
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 22px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+.dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--fg-muted); flex: none;
+  transition: background .3s;
+}
+.dot.ok { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 18%, transparent); }
+.dot.warn { background: var(--warn); box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 18%, transparent); }
+.dot.bad { background: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+
+.badge {
+  font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+
+button.ghost {
+  font: inherit; font-size: 12px;
+  padding: 5px 11px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--fg);
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+button.ghost:hover { background: var(--border); }
+button.ghost:active { transform: translateY(1px); }
+
+/* ---------- sekmeler ---------- */
+
+.tabs {
+  display: flex; gap: 2px; padding: 0 22px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.tab {
+  font: inherit; font-size: 13px; font-weight: 500;
+  padding: 9px 14px; border: 0; background: none; color: var(--fg-muted);
+  border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px;
+}
+.tab:hover { color: var(--fg); }
+.tab.active { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+
+main { padding: 22px; max-width: 1100px; margin: 0 auto; }
+
+/* ---------- uyari ---------- */
+
+.notice {
+  padding: 11px 14px; border-radius: 10px; margin-bottom: 18px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 13px; line-height: 1.5;
+  border-left: 3px solid var(--warn);
+}
+.notice.bad { border-left-color: var(--danger); }
+
+/* ---------- kartlar ---------- */
+
+.cards {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+}
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex; gap: 16px; align-items: center;
+}
+
+.ring { flex: none; position: relative; width: 76px; height: 76px; }
+.ring svg { transform: rotate(-90deg); display: block; }
+.ring .val {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 650; letter-spacing: -.02em;
+}
+
+.card-body { min-width: 0; flex: 1; }
+.card-label {
+  font-size: 13px; font-weight: 600; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-reset { font-size: 12px; color: var(--fg-muted); }
+.card-reset b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.card-extra { margin-top: 7px; font-size: 11px; color: var(--fg-muted); }
+
+/* su an fiilen daraltan limit one cikar */
+.card.is-active { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+
+.burn {
+  margin-top: 5px; font-size: 11.5px; color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.burn.bad { color: var(--danger); }
+.burn b { font-weight: 650; }
+
+.tag {
+  display: inline-block; margin-top: 7px;
+  font-size: 11px; font-weight: 600; letter-spacing: .01em;
+  padding: 2px 8px; border-radius: 999px;
+}
+.tag-ok     { background: color-mix(in srgb, var(--ok) 16%, transparent);     color: var(--ok); }
+.tag-warn   { background: color-mix(in srgb, var(--warn) 18%, transparent);   color: var(--warn); }
+.tag-danger { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+
+.meta {
+  margin-top: 14px; padding: 11px 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; font-size: 12.5px; color: var(--fg-muted);
+}
+.meta b { color: var(--fg); font-weight: 600; }
+
+.empty {
+  text-align: center; color: var(--fg-muted); padding: 48px 20px;
+  border: 1px dashed var(--border); border-radius: var(--radius);
+}
+
+/* ---------- grafik ---------- */
+
+.panel { animation: fade .18s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; } }
+
+.chart-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; color: var(--fg-muted); }
+.legend i { width: 10px; height: 3px; border-radius: 2px; }
+
+canvas {
+  width: 100%; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin: 12px 0 8px;
+}
+
+/* ---------- ham veri ---------- */
+
+pre#raw {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px; line-height: 1.6; margin-top: 12px;
+}
+
+/* ---------- tanilama ---------- */
+
+table.diag { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.diag td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.diag td:first-child { color: var(--fg-muted); width: 190px; white-space: nowrap; }
+table.diag td:last-child { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; word-break: break-word; }
+
+ul.policy { font-size: 13px; line-height: 1.9; padding-left: 20px; margin: 0; }
+ul.policy .never { color: var(--ok); font-weight: 650; }
+
+footer {
+  padding: 14px 22px; border-top: 1px solid var(--border);
+  color: var(--fg-muted); font-size: 12px; margin-top: 20px;
+  background: var(--surface);
+}
+
+@media (max-width: 620px) {
+  .topbar { flex-wrap: wrap; }
+  main { padding: 16px; }
+  .cards { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Kota Panosu</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot" id="health-dot" title="baglanti durumu"></span>
+    <h1>Claude Kota Panosu</h1>
+    <span class="badge" id="plan-badge" hidden></span>
+  </div>
+  <div class="topbar-right">
+    <span class="muted" id="last-updated">yukleniyor…</span>
+    <button id="refresh-btn" class="ghost" title="Nazik aralik korunur">Yenile</button>
+    <button id="theme-btn" class="ghost" title="Tema">◐</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-tab="quotas">Kotalar</button>
+  <button class="tab" data-tab="history">Geçmiş</button>
+  <button class="tab" data-tab="raw">Ham veri</button>
+  <button class="tab" data-tab="diag">Tanılama</button>
+</nav>
+
+<main>
+  <!-- uyari seridi -->
+  <div id="notice" class="notice" hidden></div>
+
+  <section id="panel-quotas" class="panel">
+    <div id="cards" class="cards"></div>
+    <div id="meta" class="meta" hidden></div>
+    <p id="empty-hint" class="empty" hidden>
+      Henüz kota verisi yok. İlk sorgu birkaç saniye sürebilir —
+      sorun devam ederse <b>Tanılama</b> sekmesine bak.
+    </p>
+  </section>
+
+  <section id="panel-history" class="panel" hidden>
+    <div class="chart-head">
+      <h2>Son 24 saat</h2>
+      <div id="legend" class="legend"></div>
+    </div>
+    <canvas id="chart" height="320"></canvas>
+    <p class="muted small">
+      Her nokta bir sorgu. Dikey eksen kullanım yüzdesi. Sıfıra düşen yerler
+      pencerenin sıfırlandığı anlardır.
+    </p>
+  </section>
+
+  <section id="panel-raw" class="panel" hidden>
+    <div class="chart-head">
+      <h2>Uçtan gelen ham JSON</h2>
+      <button id="copy-raw" class="ghost">Kopyala</button>
+    </div>
+    <p class="muted small">
+      <code>/api/oauth/usage</code> belgelenmemiş bir uç — şeması değişebilir.
+      Kartlar boş kalıyorsa gerçek şekli burada görüp ayrıştırıcıyı ona göre
+      düzeltiriz.
+    </p>
+    <pre id="raw"></pre>
+  </section>
+
+  <section id="panel-diag" class="panel" hidden>
+    <h2>Tanılama</h2>
+    <table class="diag" id="diag-table"></table>
+
+    <h2 style="margin-top:28px">Sorgu politikası</h2>
+    <ul class="policy">
+      <li><b>Aralık:</b> varsayılan 180 sn. 60 sn'nin altına inilemez.</li>
+      <li><b>Hata durumunda:</b> üstel backoff, en fazla 900 sn.</li>
+      <li><b>Token rotasyonu:</b> <span class="never">yapılmaz</span>. Limite
+          çarparsak bekler, son bilinen değeri göstermeye devam ederiz.</li>
+      <li><b>Kimlik dosyası:</b> yalnızca okunur, asla yazılmaz.</li>
+      <li><b>Ağ:</b> yalnızca <code>api.anthropic.com</code>. Telemetri yok.</li>
+      <li><b>Bağlanma:</b> yalnızca <code>127.0.0.1</code>.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <span id="foot-status">—</span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
