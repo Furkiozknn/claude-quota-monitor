@@ -35,6 +35,16 @@ SETTINGS = Path.home() / ".claude" / "quota-widget.json"
 REFRESH_MS = 15_000          # yerel sunucuya bakma sikligi (Anthropic'e degil)
 RETRY_MS = 5_000             # sunucu kapaliyken tekrar deneme
 
+SNAP_PX = 24                 # bu mesafeye yaklasinca kenara yapisir
+WIDGET_W = 190
+
+# Gosterim modlari. "mini" yalnizca su an seni fiilen sinirlayan limiti
+# gosterir — ekranda en az yer kaplayan hali.
+MODES = ("full", "compact", "mini")
+MODE_ROWS = {"full": 3, "compact": 2, "mini": 1}
+MODE_LABELS = {"full": "Tam (3 satır)", "compact": "Kompakt (2 satır)",
+               "mini": "Mini (1 satır)"}
+
 # Kompakt etiketler — dar alanda uzun isim sigmiyor
 SHORT_LABELS = {
     "session": "5s",
@@ -80,10 +90,10 @@ def save_settings(data: dict) -> None:
 
 
 class Widget:
-    def __init__(self, port: int, theme: str, autostart: bool, compact: bool):
+    def __init__(self, port: int, theme: str, autostart: bool, mode: str):
         self.port = port
         self.autostart = autostart
-        self.compact = compact
+        self.mode = mode if mode in MODES else "full"
         self.settings = load_settings()
         self.colors = PALETTE[theme if theme in PALETTE else "dark"]
         self.theme_name = theme
@@ -100,17 +110,18 @@ class Widget:
         except Exception:
             pass
 
+        self.root.update_idletasks()
         x = self.settings.get("x")
         y = self.settings.get("y")
         if x is None or y is None:
-            # varsayilan: sag ust kose, gorev cubugundan uzak
-            self.root.update_idletasks()
-            x = self.root.winfo_screenwidth() - 210
+            x = self.root.winfo_screenwidth() - WIDGET_W - 20   # sag ust kose
             y = 40
-        self.root.geometry(f"+{int(x)}+{int(y)}")
+        # Kayitli konum ekran disinda kalmis olabilir (monitor degistiyse,
+        # cozunurluk dustuyse). Gorunur alana geri cekiyoruz.
+        self._place(int(x), int(y))
 
         self.canvas = tk.Canvas(
-            self.root, width=190, height=64, highlightthickness=1,
+            self.root, width=WIDGET_W, height=64, highlightthickness=1,
             highlightbackground=self.colors["border"], bg=self.colors["bg"],
         )
         self.canvas.pack()
@@ -140,16 +151,52 @@ class Widget:
         y = self.root.winfo_y() + event.y - self._dy
         self.root.geometry(f"+{x}+{y}")
 
+    def _place(self, x: int, y: int, snap: bool = False) -> None:
+        """Pencereyi konumlandirir; ekran disina tasmaz, istege bagli yapisir."""
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+        w = self.root.winfo_width() or WIDGET_W
+        h = self.root.winfo_height() or 64
+
+        if snap:
+            # Kenara SNAP_PX'ten yakinsa tam yapistir. Boylece widget
+            # ekranin kenarinda duzgun durur, elle piksel piksel
+            # hizalamaya gerek kalmaz.
+            if x <= SNAP_PX:
+                x = 0
+            elif x + w >= sw - SNAP_PX:
+                x = sw - w
+            if y <= SNAP_PX:
+                y = 0
+            elif y + h >= sh - SNAP_PX:
+                y = sh - h
+
+        # Her durumda gorunur alanda kal
+        x = max(0, min(x, sw - w))
+        y = max(0, min(y, sh - h))
+        self.root.geometry(f"+{x}+{y}")
+
     def _drag_end(self, event) -> None:
-        if getattr(self, "_moved", False):
-            self.settings["x"] = self.root.winfo_x()
-            self.settings["y"] = self.root.winfo_y()
-            save_settings(self.settings)
+        if not getattr(self, "_moved", False):
+            return
+        self._place(self.root.winfo_x(), self.root.winfo_y(), snap=True)
+        self.settings["x"] = self.root.winfo_x()
+        self.settings["y"] = self.root.winfo_y()
+        save_settings(self.settings)
 
     def _build_menu(self) -> None:
         m = tk.Menu(self.root, tearoff=0)
         m.add_command(label="Panoyu aç", command=self.open_dashboard)
         m.add_separator()
+
+        boyut = tk.Menu(m, tearoff=0)
+        for mod in MODES:
+            boyut.add_command(
+                label=MODE_LABELS[mod],
+                command=lambda mo=mod: self.set_mode(mo),
+            )
+        m.add_cascade(label="Boyut", menu=boyut)
+
         m.add_command(label="Temayı değiştir", command=self.toggle_theme)
         m.add_command(label="Saydamlık +", command=lambda: self.nudge_alpha(+0.06))
         m.add_command(label="Saydamlık −", command=lambda: self.nudge_alpha(-0.06))
@@ -168,6 +215,17 @@ class Widget:
     def open_dashboard(self) -> None:
         import webbrowser
         webbrowser.open(f"http://127.0.0.1:{self.port}/")
+
+    def set_mode(self, mode: str) -> None:
+        if mode not in MODES:
+            return
+        self.mode = mode
+        self.settings["mode"] = mode
+        save_settings(self.settings)
+        self.draw()
+        # Boy degisince alt kenar kaydi; yapisik duruyorsa yeniden hizala.
+        self.root.update_idletasks()
+        self._place(self.root.winfo_x(), self.root.winfo_y(), snap=True)
 
     def toggle_theme(self) -> None:
         self.theme_name = "light" if self.theme_name == "dark" else "dark"
@@ -271,11 +329,11 @@ class Widget:
                           fill=col["muted"], font=("Segoe UI", 8))
             return
 
-        # Gosterilecekler: aktif/kritik olanlar + oturum + haftalik.
-        # Dar alanda en fazla 3 satir.
+        # Once su an fiilen sinirlayan limit, sonra dolulukta azalan sirayla.
+        # Mini modda yalnizca ilki gosterilir — asil merak edilen o.
         cards = [x for x in self.cards if x.get("percent") is not None]
         cards.sort(key=lambda x: (not x.get("is_active"), -(x.get("percent") or 0)))
-        cards = cards[:3] if not self.compact else cards[:2]
+        cards = cards[:MODE_ROWS.get(self.mode, 3)]
 
         row_h = 20
         height = max(28, len(cards) * row_h + 8)
@@ -315,11 +373,13 @@ def main() -> int:
     parser.add_argument("--autostart", action="store_true", default=True,
                         help="Sunucu kapaliysa kendisi baslatir (varsayilan acik)")
     parser.add_argument("--no-autostart", dest="autostart", action="store_false")
-    parser.add_argument("--compact", action="store_true",
-                        help="Yalnizca 2 satir goster")
+    parser.add_argument("--mode", default=settings.get("mode", "full"),
+                        choices=list(MODES),
+                        help="full = 3 satir, compact = 2, mini = yalnizca "
+                             "su an sinirlayan limit")
     args = parser.parse_args()
 
-    Widget(args.port, args.theme, args.autostart, args.compact).run()
+    Widget(args.port, args.theme, args.autostart, args.mode).run()
     return 0
 
 

@@ -109,6 +109,30 @@ bilgisi bulunamadı. Betiklerden kullanışlı.
 - **Ham veri** — uçtan gelen JSON, olduğu gibi.
 - **Tanılama** — HTTP durumu, son deneme, backoff durumu, politika özeti.
 
+## Masaüstü widget'i
+
+```bash
+pythonw widget.py            # konsolsuz
+python widget.py --mode mini
+```
+
+Çerçevesiz, her zaman üstte, sürüklenebilir küçük pencere. Kenara
+yaklaşınca yapışır; ekran dışında kalmaz (monitör değişse bile görünür
+alana çekilir).
+
+| Mod | Ne gösterir |
+|---|---|
+| `full` | 3 satır — bütün pencereler |
+| `compact` | 2 satır |
+| `mini` | 1 satır — yalnızca şu an seni fiilen sınırlayan limit |
+
+Sağ tık → boyut, tema, saydamlık, kapat. Çift tık → panoyu açar.
+Konum/tema/mod/saydamlık `~/.claude/quota-widget.json`'a yazılır.
+
+**Widget Anthropic'e istek atmaz.** Yerel sunucunun `/api/status` ucundan
+okur. Tek veri kaynağı, çift sorgu yok, nazik olma politikası korunur.
+Sunucu kapalıysa kendisi başlatır (`--no-autostart` ile kapatılır).
+
 ## Testler
 
 ```bash

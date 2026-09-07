@@ -13,8 +13,7 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-2. **Çoklu görünüm** — anlık / günlük / aylık.
+1. **Çoklu görünüm** — anlık / günlük / aylık.
 3. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
 4. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
@@ -23,6 +22,24 @@ onay bekliyor. Yerel git commit'i serbest.
 ---
 
 ## Tamamlananlar
+
+### v0.11.0 — Widget: yapışma, sığma, mini mod · 7 Eylül, gece
+- **Kenara yapışma.** Sürükleyip bırakınca ekran kenarına 24 px'ten
+  yakınsa tam yapışır. Piksel piksel hizalamaya gerek kalmıyor.
+- **Ekran dışına kaçmama.** Kayıtlı konum artık her açılışta görünür
+  alana sıkıştırılıyor. Monitör değişir veya çözünürlük düşerse widget
+  kaybolmuyordu — şimdi kaybolmaz.
+- **Üç gösterim modu** (`--mode`, sağ tık → Boyut):
+  `full` 3 satır, `compact` 2, **`mini` 1 satır**.
+  Mini modda yalnızca *şu an fiilen sınırlayan* limit görünür — asıl
+  merak edilen o, ve ekranda en az yer kaplayan hâli.
+- Mod değişince yükseklik değiştiği için yapışma yeniden hizalanıyor;
+  yoksa alta yapışık widget havada kalırdı.
+- Mod ayarı da `~/.claude/quota-widget.json`'a kaydediliyor.
+- README'ye widget bölümü eklendi.
+
+Doğrulandı: derleme temiz, `--help` üç modu listeliyor, widget ayakta.
+Görsel doğrulama yapılamadı — masaüstü görülemiyor.
 
 ### v0.10.0 — Paylaşıma hazırlık · 7 Eylül, gece
 - `LICENSE` (MIT). Telif adı `Furkiozknn` — GitHub kullanıcı adı, gerçek
