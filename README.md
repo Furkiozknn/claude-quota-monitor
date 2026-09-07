@@ -6,6 +6,15 @@ geçmiş grafiği.
 
 Ekranda sürekli yer kaplamaz — istediğinde tarayıcıda açarsın.
 
+![Pano — koyu tema](docs/images/pano-koyu.png)
+
+<details>
+<summary>Açık tema</summary>
+
+![Pano — açık tema](docs/images/pano-acik.png)
+
+</details>
+
 ## Neden
 
 Mevcut araçlar ikiye ayrılıyor:

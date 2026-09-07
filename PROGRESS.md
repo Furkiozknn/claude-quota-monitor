@@ -13,16 +13,40 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
-2. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-3. **Çoklu görünüm** — anlık / günlük / aylık.
-4. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-5. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+1. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
+2. **Çoklu görünüm** — anlık / günlük / aylık.
+3. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+4. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
+5. **Geçmiş sekmesi ekran görüntüsü** — yeterli veri birikince çek.
 
 ---
 
 ## Tamamlananlar
+
+### v0.10.0 — Paylaşıma hazırlık · 7 Eylül, gece
+- `LICENSE` (MIT). Telif adı `Furkiozknn` — GitHub kullanıcı adı, gerçek
+  ad uydurulmadı; sahibi isterse değiştirir.
+- **Playwright ile gerçek ekran görüntüleri** alındı. Arayüzü ilk kez
+  gördüm ve üç kusur ortaya çıktı:
+  1. **Sürüm numarası `v0.1.0`'da donmuştu.** PROGRESS ve commit'lerde
+     sürüm yükseltiliyordu ama `APP_VERSION` sabiti hiç güncellenmemişti.
+     Altbilgide yanlış sürüm yazıyordu. → `0.10.0`.
+  2. **Türkçe karakterler eksikti.** Etiketler ASCII yazılmıştı:
+     "Haftalik — Tum modeller", "Kapsamli", "KRITIK", "sifir", "simdi".
+     Kod yorumları ASCII kalabilir ama **kullanıcının gördüğü metin**
+     düzgün Türkçe olmalı. 9 ifade düzeltildi.
+  3. **Altbilgi sayfanın ortasında asılı kalıyordu.** İçerik kısa olunca
+     altında koca boşluk vardı. `body` dikey esnek dizilim + `main{flex:1}`.
+- **Favicon eklendi.** Konsolda 404 veriyordu. Gömülü SVG data URI —
+  ayrı dosya yok, ayrı istek yok. Kota halkasının kendisi.
+
+Doğrulandı: konsol hatasız, 15 test OK, iki temada da ekran görüntüsü
+alındı ve README'ye eklendi.
+
+**Gözlem:** Bütün pencereler gece sıfırlandı. Haftalık %86 → **%1**,
+sıfırlanmasına 6 gün 21 saat. Yani gerçekten 7 günlük pencere; önceki
+turlarda gördüğüm "5dk" bir önceki döngünün kuyruğuymuş. Sabah kotan taze.
 
 ### v0.9.0 — WCAG kontrast denetimi · 7 Eylül, gece
 - `tools/contrast_check.py` — palet renklerinin WCAG 2.2 AA oranlarını

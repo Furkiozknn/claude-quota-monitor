@@ -37,7 +37,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 APP_NAME = "claude-quota-monitor"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.10.0"
 
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
@@ -58,9 +58,9 @@ RESET_KEYS = re.compile(r"reset|resets_at|expires|refresh|renew", re.I)
 # Bu dizi birincil kaynak: yapisi duzgun ve severity'yi ucun kendisi veriyor.
 KIND_LABELS = {
     "session": "5 Saatlik Oturum",
-    "weekly_all": "Haftalik — Tum modeller",
-    "weekly_scoped": "Haftalik — Kapsamli",
-    "monthly": "Aylik",
+    "weekly_all": "Haftalık — Tüm modeller",
+    "weekly_scoped": "Haftalık — Kapsamlı",
+    "monthly": "Aylık",
     "opus": "Opus",
     "sonnet": "Sonnet",
 }
@@ -68,12 +68,12 @@ KIND_LABELS = {
 # Yedek yol icin ust seviye anahtar etiketleri
 WINDOW_LABELS = {
     "five_hour": "5 Saatlik Oturum",
-    "seven_day": "Haftalik (7 gun)",
-    "seven_day_opus": "Haftalik — Opus",
-    "seven_day_sonnet": "Haftalik — Sonnet",
-    "seven_day_cowork": "Haftalik — Cowork",
-    "seven_day_oauth_apps": "Haftalik — OAuth uygulamalari",
-    "monthly": "Aylik",
+    "seven_day": "Haftalık (7 gün)",
+    "seven_day_opus": "Haftalık — Opus",
+    "seven_day_sonnet": "Haftalık — Sonnet",
+    "seven_day_cowork": "Haftalık — Cowork",
+    "seven_day_oauth_apps": "Haftalık — OAuth uygulamaları",
+    "monthly": "Aylık",
 }
 
 # Ucun cevabinda yayinlanmamis ozelliklere ait kod adlari donuyor
@@ -559,7 +559,7 @@ class Poller(threading.Thread):
             secs = int(card["resets_at"] - time.time())
             if secs > 0:
                 h, m = secs // 3600, (secs % 3600) // 60
-                left = f" Sifirlanmasina {h} sa {m} dk."
+                left = f" Sıfırlanmasına {h} sa {m} dk."
         try:
             send(f"Claude kota: {card['label']}",
                  f"%{card['percent']:.0f} doldu.{left}")
@@ -708,7 +708,7 @@ SHORT = {
     "five_hour": "5s", "seven_day": "7g",
 }
 SEV_MARK = {"critical": "!", "warning": "*", "normal": ""}
-SEV_WORD = {"critical": "KRITIK", "warning": "dikkat", "normal": "normal"}
+SEV_WORD = {"critical": "KRİTİK", "warning": "dikkat", "normal": "normal"}
 
 
 def _short_name(card: dict) -> str:
@@ -740,7 +740,7 @@ def _fmt_left(epoch: float | None) -> str:
         return "-"
     secs = int(epoch - time.time())
     if secs <= 0:
-        return "simdi"
+        return "şimdi"
     h, m = secs // 3600, (secs % 3600) // 60
     if h >= 24:
         return f"{h // 24}g{h % 24}s"
@@ -759,18 +759,18 @@ def one_shot(port: int, compact: bool) -> int:
     if data is None:
         token, meta = read_token()
         if not token:
-            print(meta.get("error", "Token okunamadi"), file=sys.stderr)
+            print(meta.get("error", "Token okunamadı"), file=sys.stderr)
             return 2
         status, body = fetch_usage(token)
         if status != 200:
-            print(f"Uc HTTP {status} dondu.", file=sys.stderr)
+            print(f"Uç HTTP {status} döndü.", file=sys.stderr)
             return 3
         data = {"cards": normalize(body), "subscription": meta.get("subscription")}
-        source = "dogrudan uc"
+        source = "doğrudan uç"
 
     cards = [c for c in (data.get("cards") or []) if c.get("percent") is not None]
     if not cards:
-        print("Kota bilgisi bulunamadi.", file=sys.stderr)
+        print("Kota bilgisi bulunamadı.", file=sys.stderr)
         return 4
 
     if compact:
@@ -788,7 +788,7 @@ def one_shot(port: int, compact: bool) -> int:
         mark = " <" if card.get("is_active") else "  "
         print(f"  {card['label'][:30]:<30} [{_bar(card['percent'])}] "
               f"{card['percent']:>3.0f}%  {SEV_WORD.get(sev, sev or '-'):<7}"
-              f" sifir: {_fmt_left(card.get('resets_at')):<8}{mark}")
+              f" sıfır: {_fmt_left(card.get('resets_at')):<8}{mark}")
     print(f"  kaynak: {source}")
     return 0
 
@@ -835,8 +835,8 @@ def main() -> int:
     print(f"  Pano      : {url}")
     print(f"  Sorgu     : {args.interval} sn'de bir (backoff max {BACKOFF_MAX} sn)")
     print(f"  Bildirim  : " + (f"%{args.notify_at} ustunde" if args.notify_at else "kapali"))
-    print(f"  Gecmis    : {args.db}")
-    print(f"  Kimlik    : {CREDENTIALS} (yalnizca okunur)")
+    print(f"  Geçmiş    : {args.db}")
+    print(f"  Kimlik    : {CREDENTIALS} (yalnızca okunur)")
     print("  Token rotasyonu YAPILMAZ. Ctrl+C ile durdurulur.")
 
     if not args.no_browser:
