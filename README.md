@@ -1,4 +1,4 @@
-# claude-quota-monitor
+<img src="docs/banner.svg" alt="claude-quota-monitor" width="720">
 
 Claude'un **resmi** kota verisini yerel bir web panosunda gösterir: 5 saatlik
 oturum penceresi, haftalık pencere, sıfırlanma geri sayımları ve 24 saatlik
@@ -108,6 +108,31 @@ bilgisi bulunamadı. Betiklerden kullanışlı.
   sıfırlandığı anlar.
 - **Ham veri** — uçtan gelen JSON, olduğu gibi.
 - **Tanılama** — HTTP durumu, son deneme, backoff durumu, politika özeti.
+
+## Ne tüketti?
+
+Panonun **"Ne tüketti?"** sekmesi, resmi kota yüzdesini yerel transcript'lerle
+ilişkilendirir. Diğer araçların yapmadığı şey bu: kota yüzdesini gösterenler
+onu neyin doldurduğunu söylemiyor, tüketimi analiz edenler de resmi yüzdeye
+erişemiyor.
+
+```
+Bu pencerede 190 tur · 5.8M ağırlıklı token · pencere doluluğu %16
+
+Projeye göre
+  D:\Claude Projeleri    ████████████  %100.0   pencerenin %16.0'ı
+Modele göre
+  claude-opus-5          ████████████  %100.0   pencerenin %16.0'ı
+```
+
+Pencerenin başlangıcı, ucun verdiği `resets_at`'ten geri sayılarak bulunur —
+yani atıf tam olarak *o pencereyi dolduran* aralığı kapsar.
+
+> **Dürüst sınır:** bu bir **oran tahmini**, kesin atıf değil. Anthropic
+> yüzdenin hangi tokenlardan geldiğini söylemiyor; yerel token ağırlıklarına
+> göre bölüşülüyor. Başka cihazdan veya claude.ai üzerinden yapılan kullanım
+> buraya yansımaz. Ağırlık = girdi + çıktı + cache oluşturma; cache **okuma**
+> ağırlığa katılmaz, ucuz olan o.
 
 ## Masaüstü widget'i
 

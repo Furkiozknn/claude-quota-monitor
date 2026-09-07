@@ -23,6 +23,40 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Tamamlananlar
 
+### v0.12.0 — "Ne tüketti?" atıf sekmesi · 7 Eylül
+Araştırma, araçların ortak boşluğunun **atıf** olduğunu gösterdi: kota
+yüzdesini gösterenler onu neyin doldurduğunu söylemiyor, tüketimi analiz
+edenler resmi yüzdeye erişemiyor. Bu sürüm ikisini birleştiriyor.
+
+- `attribution.py` — `~/.claude/projects/**/*.jsonl` okuyup token tüketimini
+  projeye, modele ve oturuma dağıtır. Yalnızca okur.
+- Pencere başlangıcı ucun `resets_at`'inden geri sayılıyor; atıf tam olarak
+  o pencereyi dolduran aralığı kapsıyor.
+- Verimlilik: dosya mtime'ı aralıktan eskiyse hiç açılmıyor; satırda
+  `"usage"` geçmiyorsa JSON ayrıştırılmıyor; sonuç 30 sn cache'leniyor.
+- Ağırlık = girdi + çıktı + cache oluşturma. Cache **okuma** ağırlığa
+  katılmıyor — ucuz olan o ve pencereyi doldurmadaki payı çok daha düşük.
+- `/api/attribution` + yeni pano sekmesi (çubuklu tablo).
+- **Dürüstlük notu arayüzde:** bu bir oran tahmini, kesin atıf değil.
+  Başka cihaz / claude.ai kullanımı yansımaz. Kullanıcı bunu görmeden
+  sayıya güvenmesin diye sekmenin başında duruyor.
+
+Doğrulandı: gerçek veriyle çalıştı — 190 tur, 5.8M ağırlıklı token,
+pencere doluluğu %16, atıf `D:\Claude Projeleri` / `claude-opus-5`.
+
+**Ayrıca bu turda:**
+- **Banner/logo** eklendi (`docs/banner.svg`). higgsfield MCP'si denendi
+  ama kredi 0.03 çıktı — körlemesine harcamak yerine SVG'yi elle yazdım.
+  Ücretsiz, her boyutta keskin, iki temada da okunur. Playwright ile
+  açık ve koyu zeminde doğrulandı.
+- **Geçmiş verisi temizlendi.** v0.1'in bozuk ayrıştırıcısından kalma
+  12 kayıt vardı (`five_hour`, `seven_day`, `nimbus_quill`, `spend`) ve
+  geçmiş grafiğini kirletiyordu. Silmeden önce sayımlar yazdırıldı.
+
+**MCP kullanım ilkesi:** MCP'ler yalnızca **yapım aşamasında** kullanılır.
+Ürettikleri şey depoya statik dosya olarak girer. Projenin çalışma zamanı
+bağımlılığı olmaz — sıfır bağımlılık sözü geçerli.
+
 ### v0.11.0 — Widget: yapışma, sığma, mini mod · 7 Eylül, gece
 - **Kenara yapışma.** Sürükleyip bırakınca ekran kenarına 24 px'ten
   yakınsa tam yapışır. Piksel piksel hizalamaya gerek kalmıyor.

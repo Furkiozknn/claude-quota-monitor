@@ -26,6 +26,7 @@
 <nav class="tabs" role="tablist">
   <button class="tab active" data-tab="quotas">Kotalar</button>
   <button class="tab" data-tab="history">Geçmiş</button>
+  <button class="tab" data-tab="attr">Ne tüketti?</button>
   <button class="tab" data-tab="raw">Ham veri</button>
   <button class="tab" data-tab="diag">Tanılama</button>
 </nav>
@@ -53,6 +54,20 @@
       Her nokta bir sorgu. Dikey eksen kullanım yüzdesi. Sıfıra düşen yerler
       pencerenin sıfırlandığı anlardır.
     </p>
+  </section>
+
+  <section id="panel-attr" class="panel" role="tabpanel" tabindex="0" hidden>
+    <div class="chart-head">
+      <h2>Bu 5 saatlik pencereyi ne tüketti?</h2>
+      <span class="muted small" id="attr-window"></span>
+    </div>
+    <p class="muted small" id="attr-caveat">
+      Bu bir <b>oran tahmini</b>, kesin atıf değil. Anthropic pencere
+      yüzdesinin hangi tokenlardan geldiğini söylemiyor; yerel token
+      ağırlıklarına göre bölüşülüyor. Başka cihazdan veya claude.ai
+      üzerinden yapılan kullanım buraya yansımaz.
+    </p>
+    <div id="attr-body"></div>
   </section>
 
   <section id="panel-raw" class="panel" role="tabpanel" tabindex="0" hidden>

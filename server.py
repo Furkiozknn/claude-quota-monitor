@@ -626,6 +626,48 @@ class Poller(threading.Thread):
 # HTTP
 # --------------------------------------------------------------------------
 
+SESSION_WINDOW = 5 * 3600     # 5 saatlik oturum penceresi
+
+
+def _attribution_payload(poller: "Poller") -> dict:
+    """Mevcut 5 saatlik pencereyi yerel transcript'lerle iliskilendirir.
+
+    Pencerenin baslangicini ucun verdigi resets_at'ten geri sayarak buluruz;
+    boylece atif tam olarak *o pencereyi dolduran* araligi kapsar.
+    """
+    snap = poller.snapshot()
+    session_card = next(
+        (c for c in (snap.get("cards") or []) if c.get("key") == "session"), None)
+
+    if session_card and session_card.get("resets_at"):
+        since = float(session_card["resets_at"]) - SESSION_WINDOW
+        kaynak = "uçtan gelen sıfırlanma zamanı"
+    else:
+        since = time.time() - SESSION_WINDOW
+        kaynak = "tahmini (uç sıfırlanma zamanı vermedi)"
+
+    try:
+        import attribution
+        data = attribution.scan(since)
+    except Exception as exc:
+        return {"_error": f"{type(exc).__name__}: {exc}"}
+
+    data["window_source"] = kaynak
+    data["session_percent"] = session_card.get("percent") if session_card else None
+
+    # Pencere yuzdesini paylara dagit: "%60 doldu, bunun %48'i su projeden".
+    # Bu bir ORAN TAHMINI — Anthropic yuzdenin hangi tokenlardan geldigini
+    # soylemiyor, biz yerel token agirliklarina gore bolusuyoruz.
+    pct = data["session_percent"]
+    if isinstance(pct, (int, float)) and data["totals"]["tokens"]:
+        for item in data["projects"]:
+            item["window_percent"] = round(pct * item["share"] / 100.0, 1)
+        for item in data["models"]:
+            item["window_percent"] = round(pct * item["share"] / 100.0, 1)
+
+    return data
+
+
 CONTENT_TYPES = {
     ".html": "text/html; charset=utf-8",
     ".css": "text/css; charset=utf-8",
@@ -674,6 +716,10 @@ def make_handler(poller: Poller, conn: sqlite3.Connection):
 
             if path == "/api/history":
                 self._json(history(conn))
+                return
+
+            if path == "/api/attribution":
+                self._json(_attribution_payload(poller))
                 return
 
             if path == "/api/raw":

@@ -275,6 +275,23 @@ pre#raw {
 
 /* ---------- tanilama ---------- */
 
+/* ---------- atif tablosu ---------- */
+
+table.attr { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.attr td { padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.attr-label {
+  max-width: 260px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; font-weight: 500;
+}
+.attr-bar { width: 34%; }
+.attr-bar span {
+  display: block; height: 8px; border-radius: 999px;
+  background: var(--accent); min-width: 2px;
+}
+.attr-share { text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; width: 62px; }
+.attr-win   { color: var(--fg-muted); font-size: 12px; white-space: nowrap; }
+.attr-tok   { text-align: right; color: var(--fg-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
 table.diag { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.diag td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
 table.diag td:first-child { color: var(--fg-muted); width: 190px; white-space: nowrap; }

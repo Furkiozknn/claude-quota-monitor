@@ -51,6 +51,7 @@ function initTabs() {
     const name = tab.dataset.tab;
     $$(".panel").forEach((p) => { p.hidden = p.id !== `panel-${name}`; });
     if (name === "history") loadHistory();
+    if (name === "attr") loadAttribution();
     if (focus) tab.focus();
   }
 
@@ -399,6 +400,76 @@ function drawChart() {
     const label = (state?.cards || []).find((c) => c.key === k)?.label || k;
     return `<span><i style="background:${SERIES_COLORS[i % SERIES_COLORS.length]}"></i>${esc(label)}</span>`;
   }).join("");
+}
+
+/* ---------------- atif: kotayi ne tuketti ---------------- */
+
+function fmtTokens(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + "K";
+  return String(n);
+}
+
+function attrTable(baslik, rows, birim) {
+  if (!rows || !rows.length) return "";
+  const max = Math.max(...rows.map((r) => r.share)) || 1;
+  return `
+    <h2 style="margin-top:20px">${baslik}</h2>
+    <table class="attr">
+      ${rows.map((r) => `
+        <tr>
+          <td class="attr-label" title="${esc(r.label || r.key)}">${esc(r.label || r.key)}</td>
+          <td class="attr-bar">
+            <span style="width:${(r.share / max) * 100}%"></span>
+          </td>
+          <td class="attr-share">%${r.share.toFixed(1)}</td>
+          <td class="attr-win">${r.window_percent != null
+            ? `pencerenin %${r.window_percent.toFixed(1)}'i` : ""}</td>
+          <td class="attr-tok">${fmtTokens(r.tokens)} ${birim}</td>
+        </tr>`).join("")}
+    </table>`;
+}
+
+async function loadAttribution() {
+  const host = $("#attr-body");
+  host.innerHTML = `<p class="muted">Transcript'ler taranıyor…</p>`;
+  let d;
+  try {
+    d = await (await fetch("/api/attribution")).json();
+  } catch {
+    host.innerHTML = `<p class="muted">Sunucuya ulaşılamadı.</p>`;
+    return;
+  }
+
+  if (d._error) {
+    host.innerHTML = `<p class="muted">Atıf hesaplanamadı: ${esc(d._error)}</p>`;
+    return;
+  }
+
+  const t = d.totals || {};
+  $("#attr-window").textContent =
+    `pencere kaynağı: ${d.window_source || "—"} · ${d.scanned_files || 0} dosya tarandı`;
+
+  if (!t.turns) {
+    host.innerHTML = `<p class="empty">Bu pencerede yerel transcript kaydı yok.</p>`;
+    return;
+  }
+
+  const ozet = `
+    <div class="meta" style="margin-top:14px">
+      Bu pencerede <b>${t.turns}</b> tur ·
+      <b>${fmtTokens(t.tokens)}</b> ağırlıklı token ·
+      çıktı <b>${fmtTokens(t.output)}</b> ·
+      cache okuma <b>${fmtTokens(t.cache_read)}</b>
+      ${d.session_percent != null
+        ? ` · pencere doluluğu <b>%${d.session_percent.toFixed(0)}</b>` : ""}
+    </div>`;
+
+  host.innerHTML = ozet
+    + attrTable("Projeye göre", d.projects, "token")
+    + attrTable("Modele göre", d.models, "token")
+    + attrTable("Oturuma göre (ilk 10)", (d.sessions || []).map(
+        (s) => ({ ...s, label: `${s.key}… · ${s.project}` })), "token");
 }
 
 /* ---------------- ham veri ---------------- */
