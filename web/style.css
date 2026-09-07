@@ -8,10 +8,19 @@
   --border: #e2e5ea;
   --fg: #1b1e23;
   --fg-muted: #666e7a;
+  /* Iki ayri aile, bilincli ayrim (bkz. tools/contrast_check.py):
+       *      -> GOSTERGE rengi (cubuk, halka). WCAG esigi 3:1.
+       *-ink  -> METIN rengi (rozet yazisi). WCAG esigi 4.5:1.
+     Ayni rengi ikisinde kullanmak rozet metnini kendi soluk arka planinin
+     uzerinde okunmaz birakiyordu — olculdu, 2.38:1'e kadar dusuyordu. */
   --accent: #c96442;
-  --ok: #2e9e5b;
-  --warn: #d98324;
-  --danger: #d64545;
+  --ok: #197f45;
+  --warn: #a85f08;
+  --danger: #c62f2f;
+  --accent-ink: #9c4527;
+  --ok-ink: #0f5c31;
+  --warn-ink: #7a4405;
+  --danger-ink: #96201f;
   --track: #e6e9ee;
   --shadow: 0 1px 2px rgba(16, 20, 26, .06), 0 4px 16px rgba(16, 20, 26, .05);
   --radius: 14px;
@@ -31,6 +40,15 @@
     --fg: #e6e8ec;
     --fg-muted: #9aa3b0;
     --track: #2b3038;
+    /* Koyu zeminde gosterge renkleri aciliyor, mürekkepler daha da aciliyor */
+    --accent: #e07a52;
+    --ok: #3fb56b;
+    --warn: #e09a3a;
+    --danger: #e05e5e;
+    --accent-ink: #f0a184;
+    --ok-ink: #6ee7a3;
+    --warn-ink: #f5c274;
+    --danger-ink: #ff9d9d;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
     color-scheme: dark;
   }
@@ -44,6 +62,14 @@
   --fg: #e6e8ec;
   --fg-muted: #9aa3b0;
   --track: #2b3038;
+  --accent: #e07a52;
+  --ok: #3fb56b;
+  --warn: #e09a3a;
+  --danger: #e05e5e;
+  --accent-ink: #f0a184;
+  --ok-ink: #6ee7a3;
+  --warn-ink: #f5c274;
+  --danger-ink: #ff9d9d;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
   color-scheme: dark;
 }
@@ -180,7 +206,7 @@ main { padding: 22px; max-width: 1100px; margin: 0 auto; }
   margin-top: 5px; font-size: 11.5px; color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
 }
-.burn.bad { color: var(--danger); }
+.burn.bad { color: var(--danger-ink); }   /* yüzey üzerinde metin -> mürekkep */
 .burn b { font-weight: 650; }
 
 /* Durum rozeti: renk + simge + metin. Renk korlugunde de okunur,
@@ -190,9 +216,11 @@ main { padding: 22px; max-width: 1100px; margin: 0 auto; }
   font-size: 11px; font-weight: 600; letter-spacing: .01em;
   padding: 2px 8px; border-radius: 999px; white-space: nowrap;
 }
-.tag-ok     { background: color-mix(in srgb, var(--ok) 16%, transparent);     color: var(--ok); }
-.tag-warn   { background: color-mix(in srgb, var(--warn) 20%, transparent);   color: var(--warn); }
-.tag-danger { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+/* Metin rengi gosterge rengi DEGIL, mürekkep. Olculdu: gosterge rengiyle
+   yazinca acik temada 2.38:1'e kadar dusuyordu, simdi 6:1 uzeri. */
+.tag-ok     { background: color-mix(in srgb, var(--ok) 16%, transparent);     color: var(--ok-ink); }
+.tag-warn   { background: color-mix(in srgb, var(--warn) 20%, transparent);   color: var(--warn-ink); }
+.tag-danger { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger-ink); }
 .tag-active {
   background: color-mix(in srgb, var(--fg) 10%, transparent);
   color: var(--fg); border: 1px solid var(--border);

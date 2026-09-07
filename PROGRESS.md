@@ -13,18 +13,39 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **Kontrast denetimi** — palet renklerinin WCAG AA oranlarını ölç ve
-   gerekirse düzelt. Yüksek kontrast modu ekle.
-2. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
-3. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
-4. **Çoklu görünüm** — anlık / günlük / aylık.
-5. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-6. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+1. **LICENSE + ekran görüntüleri** — paylaşıma hazırlık.
+2. **Widget iyileştirmeleri** — kenara yapışma, daha kompakt mod.
+3. **Çoklu görünüm** — anlık / günlük / aylık.
+4. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+5. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
 
 ---
 
 ## Tamamlananlar
+
+### v0.9.0 — WCAG kontrast denetimi · 7 Eylül, gece
+- `tools/contrast_check.py` — palet renklerinin WCAG 2.2 AA oranlarını
+  **ölçer**. Göz kararı yok. Başarısızlıkta çıkış kodu `1`.
+- **İlk denetim 10 başarısızlık buldu.** En kötüsü açık temada rozet metni:
+  `2.38:1` (eşik 4.5). Yani "dikkat" rozeti neredeyse okunmuyordu.
+- **Kök neden:** aynı rengi hem gösterge (çubuk) hem metin olarak
+  kullanıyordum. Metin, kendi renginin soluk karışımının üzerinde duruyor —
+  doğal olarak kontrast çöküyor.
+- **Çözüm:** iki ayrı renk ailesi.
+  `--ok/--warn/--danger` = gösterge (eşik 3:1),
+  `--ok-ink/--warn-ink/--danger-ink` = metin (eşik 4.5:1).
+- Rozet metinleri artık 6.0–8.2:1 arasında. **Sıfır başarısızlık.**
+- **Yakalanan hata:** koyu tema iki yerde tanımlı (`prefers-color-scheme`
+  ve elle `[data-theme="dark"]`). İlk düzeltme yalnızca birincisine
+  girmişti — temayı elle koyuya alınca açık tema renkleri kalıyordu.
+- Widget'ın kendi paleti de aynı kusuru taşıyordu; denetlenmiş renklerle
+  hizalandı ve yeniden başlatıldı.
+- **Bilinçli kapsam dışı:** kart kenarlığı (1.26:1). WCAG 1.4.11 durum
+  bildiren bileşenler için; iki benzer yüzeyi ayıran dekoratif çizgi değil.
+  3:1'e zorlamak panoyu kutu kutu yapardı.
+
+Doğrulandı: kontrast 0 başarısızlık (çıkış 0), 15 test OK, widget ayakta.
 
 ### v0.8.0 — Birim testler · 7 Eylül, gece
 - `tests/test_normalize.py` — 15 test, bağımlılık yok, hepsi geçiyor.

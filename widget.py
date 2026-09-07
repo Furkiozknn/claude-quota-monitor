@@ -44,16 +44,20 @@ SHORT_LABELS = {
     "seven_day": "7g",
 }
 
+# Renkler panonun denetlenmis paletiyle ayni (bkz. tools/contrast_check.py).
+# Cubuklar gosterge sayilir; WCAG esigi 3:1 ve bu degerler track uzerinde
+# olculup gecirildi. Widget'ta rozet metni yok, o yuzden murekkep aileye
+# ihtiyac duyulmuyor.
 PALETTE = {
     "dark": {
-        "bg": "#16181d", "fg": "#e6e8ec", "muted": "#8b94a3",
-        "track": "#2b3038", "ok": "#4a9eff", "warn": "#e0a030", "danger": "#e05555",
-        "border": "#2d323b",
+        "bg": "#16181d", "fg": "#e6e8ec", "muted": "#9aa3b0",
+        "track": "#2b3038", "ok": "#3fb56b", "warn": "#e09a3a",
+        "danger": "#e05e5e", "border": "#2d323b",
     },
     "light": {
-        "bg": "#ffffff", "fg": "#1b1e23", "muted": "#6b7280",
-        "track": "#e6e9ee", "ok": "#c96442", "warn": "#d98324", "danger": "#d64545",
-        "border": "#dfe3e8",
+        "bg": "#ffffff", "fg": "#1b1e23", "muted": "#666e7a",
+        "track": "#e6e9ee", "ok": "#197f45", "warn": "#a85f08",
+        "danger": "#c62f2f", "border": "#dfe3e8",
     },
 }
 

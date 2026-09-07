@@ -106,6 +106,14 @@ bilgisi bulunamadı. Betiklerden kullanışlı.
 python -m unittest discover -s tests -v
 ```
 
+```bash
+python tools/contrast_check.py
+```
+
+Palet renklerinin WCAG 2.2 AA kontrast oranlarını ölçer (normal metin 4.5:1,
+arayüz bileşeni 3:1). Başarısızlık varsa çıkış kodu `1`. Renk seçimi göz
+kararıyla değil ölçümle yapıldı — ilk denetimde 10 başarısızlık çıkmıştı.
+
 15 test, bağımlılık yok. `tests/test_normalize.py` gerçek bir uç yanıtının
 kopyasını fixture olarak tutuyor — şema değişirse veya ayrıştırıcı bozulursa
 burada yakalanır. Kapsam: `limits` dizisinden kart üretimi, kod adı
