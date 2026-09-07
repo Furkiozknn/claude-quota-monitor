@@ -26,28 +26,10 @@ AA_TEXT = 4.5
 AA_LARGE = 3.0
 AA_UI = 3.0
 
-# Iki ayri renk ailesi var ve bu bilincli bir ayrim:
-#   *      -> GOSTERGE rengi (cubuk dolgusu, halka). Esik 3:1.
-#   *-ink  -> METIN rengi (rozet yazisi). Esik 4.5:1.
-# Ayni rengi ikisinde de kullanmak, rozet metnini kendi soluk arka planinin
-# uzerinde okunmaz birakiyordu.
-LIGHT = {
-    "bg": "#f6f7f9", "surface": "#ffffff", "surface-2": "#f0f2f5",
-    "border": "#e2e5ea", "fg": "#1b1e23", "fg-muted": "#666e7a",
-    "accent": "#c96442", "ok": "#197f45", "warn": "#a85f08",
-    "danger": "#c62f2f", "track": "#e6e9ee",
-    "ok-ink": "#0f5c31", "warn-ink": "#7a4405", "danger-ink": "#96201f",
-    "accent-ink": "#9c4527",
-}
-
-DARK = {
-    "bg": "#14161a", "surface": "#1c1f25", "surface-2": "#22262d",
-    "border": "#2d323b", "fg": "#e6e8ec", "fg-muted": "#9aa3b0",
-    "accent": "#e07a52", "ok": "#3fb56b", "warn": "#e09a3a",
-    "danger": "#e05e5e", "track": "#2b3038",
-    "ok-ink": "#6ee7a3", "warn-ink": "#f5c274", "danger-ink": "#ff9d9d",
-    "accent-ink": "#f0a184",
-}
+# Renkler tek kaynaktan: palette.py. Burada kopya tutulmaz.
+from pathlib import Path as _P  # noqa: E402
+sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
+from palette import DARK, LIGHT  # noqa: E402
 
 
 def _rgb(hex_color: str) -> tuple[float, float, float]:

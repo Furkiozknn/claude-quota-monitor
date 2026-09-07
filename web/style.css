@@ -1,78 +1,53 @@
-/* Claude Kota Panosu — tema degiskenleri acik modda tanimlanir,
-   koyu mod ve elle secim yalnizca onlari ezer. */
+/* Claude Kota Panosu — tema jetonlari.
+
+   Her jeton TEK BIR YERDE tanimlanir: light-dark(acik, koyu).
+   Tarayici, color-scheme'e gore dogru tarafi secer.
+
+   Neden boyle: onceki surumde koyu tema iki ayri blokta yaziliydi
+   (prefers-color-scheme sorgusu + elle [data-theme="dark"]). Bir duzeltme
+   yalnizca birine girdi, elle koyu temada acik renkler kaldi. Bu yapi o hata
+   sinifini ortadan kaldiriyor: kopya yok, senkron tutulacak sey yok.
+
+   Renk degerleri palette.py ile birebir ayni; tests/test_consistency.py
+   bunu dogrular. Kontrast oranlari tools/contrast_check.py ile olculmustur.
+
+   Iki renk ailesi, bilincli ayrim:
+     *      -> GOSTERGE rengi (cubuk, halka).   WCAG esigi 3:1
+     *-ink  -> METIN rengi (rozet yazisi).      WCAG esigi 4.5:1
+   Ayni rengi ikisinde kullanmak rozet metnini kendi soluk arka planinin
+   uzerinde okunmaz birakiyordu — olculdu, 2.38:1'e kadar dusuyordu. */
 
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f0f2f5;
-  --border: #e2e5ea;
-  --fg: #1b1e23;
-  --fg-muted: #666e7a;
-  /* Iki ayri aile, bilincli ayrim (bkz. tools/contrast_check.py):
-       *      -> GOSTERGE rengi (cubuk, halka). WCAG esigi 3:1.
-       *-ink  -> METIN rengi (rozet yazisi). WCAG esigi 4.5:1.
-     Ayni rengi ikisinde kullanmak rozet metnini kendi soluk arka planinin
-     uzerinde okunmaz birakiyordu — olculdu, 2.38:1'e kadar dusuyordu. */
-  --accent: #c96442;
-  --ok: #197f45;
-  --warn: #a85f08;
-  --danger: #c62f2f;
-  --accent-ink: #9c4527;
-  --ok-ink: #0f5c31;
-  --warn-ink: #7a4405;
-  --danger-ink: #96201f;
-  --track: #e6e9ee;
-  --shadow: 0 1px 2px rgba(16, 20, 26, .06), 0 4px 16px rgba(16, 20, 26, .05);
+  color-scheme: light dark;            /* varsayilan: sistem tercihi */
+
+  --bg:         light-dark(#f6f7f9, #14161a);
+  --surface:    light-dark(#ffffff, #1c1f25);
+  --surface-2:  light-dark(#f0f2f5, #22262d);
+  --border:     light-dark(#e2e5ea, #2d323b);
+  --fg:         light-dark(#1b1e23, #e6e8ec);
+  --fg-muted:   light-dark(#666e7a, #9aa3b0);
+  --track:      light-dark(#e6e9ee, #2b3038);
+
+  --accent:     light-dark(#c96442, #e07a52);
+  --ok:         light-dark(#197f45, #3fb56b);
+  --warn:       light-dark(#a85f08, #e09a3a);
+  --danger:     light-dark(#c62f2f, #e05e5e);
+
+  --accent-ink: light-dark(#9c4527, #f0a184);
+  --ok-ink:     light-dark(#0f5c31, #6ee7a3);
+  --warn-ink:   light-dark(#7a4405, #f5c274);
+  --danger-ink: light-dark(#96201f, #ff9d9d);
+
+  --shadow: light-dark(
+    0 1px 2px rgba(16, 20, 26, .06), 0 4px 16px rgba(16, 20, 26, .05),
+    0 1px 2px rgba(0, 0, 0, .4),     0 4px 20px rgba(0, 0, 0, .3)
+  );
   --radius: 14px;
 }
 
-:root[data-theme="dark"],
-:root:not([data-theme="light"]) {
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #14161a;
-    --surface: #1c1f25;
-    --surface-2: #22262d;
-    --border: #2d323b;
-    --fg: #e6e8ec;
-    --fg-muted: #9aa3b0;
-    --track: #2b3038;
-    /* Koyu zeminde gosterge renkleri aciliyor, mürekkepler daha da aciliyor */
-    --accent: #e07a52;
-    --ok: #3fb56b;
-    --warn: #e09a3a;
-    --danger: #e05e5e;
-    --accent-ink: #f0a184;
-    --ok-ink: #6ee7a3;
-    --warn-ink: #f5c274;
-    --danger-ink: #ff9d9d;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #14161a;
-  --surface: #1c1f25;
-  --surface-2: #22262d;
-  --border: #2d323b;
-  --fg: #e6e8ec;
-  --fg-muted: #9aa3b0;
-  --track: #2b3038;
-  --accent: #e07a52;
-  --ok: #3fb56b;
-  --warn: #e09a3a;
-  --danger: #e05e5e;
-  --accent-ink: #f0a184;
-  --ok-ink: #6ee7a3;
-  --warn-ink: #f5c274;
-  --danger-ink: #ff9d9d;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 20px rgba(0, 0, 0, .3);
-  color-scheme: dark;
-}
+/* Elle secim yalnizca color-scheme'i cevirir; butun jetonlar onu izler. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 

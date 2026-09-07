@@ -23,6 +23,32 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Tamamlananlar
 
+### v0.13.0 — Hata sınıfını yok etme · 7 Eylül
+Kullanıcının ilkesi: hatayı düzeltme, kök nedenini analiz et ve tekrarını
+önle. Gece yapılan dört hata tek bir sınıfa giriyordu: **birden fazla yerde
+elle senkron tutulan kopya.** Sürüm sabiti donmuştu, koyu tema iki blokta
+yazılıydı, widget paleti panodan sapmıştı, etiketler ASCII kalmıştı.
+
+Düzeltme değil, yapısal değişiklik:
+- **`light-dark()`** — CSS'te her jeton artık tek yerde:
+  `--bg: light-dark(#f6f7f9, #14161a)`. Koyu tema bloğu diye bir şey
+  kalmadı; elle seçim yalnızca `color-scheme`'i çeviriyor. "Bir bloğu
+  düzeltip diğerini unutmak" fiziksel olarak imkânsız hale geldi.
+- **`palette.py`** — renklerin tek gerçek kaynağı. `widget.py` ve
+  `tools/contrast_check.py` buradan okuyor; ikinci kopya yok.
+- **`tests/test_consistency.py`** — 9 test, her biri yaşanmış bir hataya
+  karşılık geliyor:
+  - `APP_VERSION` ↔ PROGRESS.md en üst sürüm (donan sürüm)
+  - her CSS jetonu tam 1 kez tanımlı (çift blok)
+  - CSS değerleri ↔ `palette.py` birebir (palet sapması)
+  - `prefers-color-scheme` içinde jeton yeniden tanımlanmıyor
+  - widget paleti `palette.py`'den türetiliyor
+  - index.html'deki her yerel varlık mevcut (favicon 404)
+  - etiketlerde ASCII Türkçe yok ("Haftalik", "KRITIK", "sifir"...)
+
+Artık `python -m unittest discover -s tests` bu hata sınıfını her
+çalıştırmada yakalıyor.
+
 ### v0.12.0 — "Ne tüketti?" atıf sekmesi · 7 Eylül
 Araştırma, araçların ortak boşluğunun **atıf** olduğunu gösterdi: kota
 yüzdesini gösterenler onu neyin doldurduğunu söylemiyor, tüketimi analiz

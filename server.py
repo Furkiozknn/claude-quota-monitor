@@ -37,7 +37,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 APP_NAME = "claude-quota-monitor"
-APP_VERSION = "0.10.0"
+APP_VERSION = "0.13.0"   # tests/test_consistency.py PROGRESS.md ile eslestigini dogrular
 
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 CREDENTIALS = Path.home() / ".claude" / ".credentials.json"

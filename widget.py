@@ -54,22 +54,21 @@ SHORT_LABELS = {
     "seven_day": "7g",
 }
 
-# Renkler panonun denetlenmis paletiyle ayni (bkz. tools/contrast_check.py).
-# Cubuklar gosterge sayilir; WCAG esigi 3:1 ve bu degerler track uzerinde
-# olculup gecirildi. Widget'ta rozet metni yok, o yuzden murekkep aileye
-# ihtiyac duyulmuyor.
-PALETTE = {
-    "dark": {
-        "bg": "#16181d", "fg": "#e6e8ec", "muted": "#9aa3b0",
-        "track": "#2b3038", "ok": "#3fb56b", "warn": "#e09a3a",
-        "danger": "#e05e5e", "border": "#2d323b",
-    },
-    "light": {
-        "bg": "#ffffff", "fg": "#1b1e23", "muted": "#666e7a",
-        "track": "#e6e9ee", "ok": "#197f45", "warn": "#a85f08",
-        "danger": "#c62f2f", "border": "#dfe3e8",
-    },
-}
+# Renkler tek kaynaktan gelir: palette.py. Burada ikinci bir kopya tutmak
+# panodan sapmaya yol aciyordu (v0.9.0'da yakalandi). Widget'ta rozet
+# metni yok, o yuzden *-ink ailesine ihtiyac duymuyor.
+try:
+    from palette import widget_palette as _widget_palette
+    PALETTE = {"dark": _widget_palette("dark"), "light": _widget_palette("light")}
+except Exception:  # widget tek basina kopyalanmissa yine de calissin
+    PALETTE = {
+        "dark": {"bg": "#1c1f25", "fg": "#e6e8ec", "muted": "#9aa3b0",
+                 "track": "#2b3038", "border": "#2d323b",
+                 "ok": "#3fb56b", "warn": "#e09a3a", "danger": "#e05e5e"},
+        "light": {"bg": "#ffffff", "fg": "#1b1e23", "muted": "#666e7a",
+                  "track": "#e6e9ee", "border": "#e2e5ea",
+                  "ok": "#197f45", "warn": "#a85f08", "danger": "#c62f2f"},
+    }
 
 
 def load_settings() -> dict:
