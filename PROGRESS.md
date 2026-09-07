@@ -13,11 +13,18 @@ onay bekliyor. Yerel git commit'i serbest.
 
 ## Sıradaki işler (öncelik sırası)
 
-1. **Çoklu görünüm** — anlık / günlük / aylık.
-3. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
-4. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
+1. **`attribution.py` testleri** — sahte JSONL ile: pencere sınırı,
+   cache okumanın ağırlığa katılmaması, mtime kısa devresi, bozuk satır.
+   (v0.13 refleksiyonu: yeni modül testsiz girdi — aynı hata sınıfı.)
+2. **`--once` sunucu kapalıyken yolu** — hiç test edilmedi. Sunucuyu
+   durdurup dene; doğrudan uç yolu gerçekten çalışıyor mu?
+3. **Playwright duman testi** — `tools/smoke.py`: sayfayı aç, konsol
+   hatası varsa çıkış 1. Favicon 404'ü ancak konsola bakınca görülmüştü.
+4. **Çoklu görünüm** — anlık / günlük / aylık.
+5. **Provenance etiketleme** — her sayının kaynağını açıkça işaretle.
+6. **Windows açılışta başlatma** — Başlangıç klasörüne kısayol
    (kayıt defteri değil; geri alınabilir olsun).
-5. **Geçmiş sekmesi ekran görüntüsü** — yeterli veri birikince çek.
+7. **Geçmiş sekmesi ekran görüntüsü** — yeterli veri birikince çek.
 
 ---
 
