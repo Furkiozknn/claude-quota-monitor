@@ -793,6 +793,18 @@ def _fmt_left(epoch: float | None) -> str:
     return f"{h}s{m:02d}dk" if h else f"{m}dk"
 
 
+def _status_error_message(status: int) -> str:
+    """HTTP durum kodunu kullaniciya anlasilir bir mesaja cevirir."""
+    if status == 0:
+        return "Ağa ulaşılamadı. İnternet bağlantını kontrol et."
+    if status == 401:
+        return ("Token reddedildi (401). Claude Code'da bir komut çalıştır; "
+                "token yenilenince tekrar dene.")
+    if status == 429:
+        return "Uç sorgu limitine takıldı (429). Biraz sonra tekrar dene."
+    return f"Uç HTTP {status} döndü."
+
+
 def one_shot(port: int, compact: bool) -> int:
     """Tarayici acmadan durumu yazdirir ve cikar.
 
@@ -809,7 +821,7 @@ def one_shot(port: int, compact: bool) -> int:
             return 2
         status, body = fetch_usage(token)
         if status != 200:
-            print(f"Uç HTTP {status} döndü.", file=sys.stderr)
+            print(_status_error_message(status), file=sys.stderr)
             return 3
         data = {"cards": normalize(body), "subscription": meta.get("subscription")}
         source = "doğrudan uç"

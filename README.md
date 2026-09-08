@@ -172,11 +172,14 @@ Palet renklerinin WCAG 2.2 AA kontrast oranlarını ölçer (normal metin 4.5:1,
 arayüz bileşeni 3:1). Başarısızlık varsa çıkış kodu `1`. Renk seçimi göz
 kararıyla değil ölçümle yapıldı — ilk denetimde 10 başarısızlık çıkmıştı.
 
-15 test, bağımlılık yok. `tests/test_normalize.py` gerçek bir uç yanıtının
+30 test, bağımlılık yok. `tests/test_normalize.py` gerçek bir uç yanıtının
 kopyasını fixture olarak tutuyor — şema değişirse veya ayrıştırıcı bozulursa
 burada yakalanır. Kapsam: `limits` dizisinden kart üretimi, kod adı
 gürültüsünün elenmesi, yedek yol, düzleştirilmiş şema, yüzde/tarih
-dönüşümleri, bozuk girdiye dayanıklılık.
+dönüşümleri, bozuk girdiye dayanıklılık. `tests/test_one_shot.py` ise
+`--once`/`--compact` çıktısını kapsar: ağ yok, yetki hatası (401), bozuk/boş
+yanıt, token yok — hiçbiri çökmez, her biri anlaşılır bir mesaj ve doğru
+çıkış koduyla biter.
 
 ## Ham veri sekmesi neden var
 
