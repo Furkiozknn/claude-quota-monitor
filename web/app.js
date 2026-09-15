@@ -509,7 +509,12 @@ function init() {
     const btn = $("#refresh-btn");
     btn.disabled = true;
     btn.textContent = "…";
-    try { await fetch("/api/refresh"); } catch { /* yoksay */ }
+    // POST: yan etkili uc GET degil (baska bir sayfa <img src> ile
+    // tetikleyip uc sorgu butcesini yakabiliyordu). same-origin olmasi
+    // Origin basliginin dogru gitmesini garantiler.
+    try {
+      await fetch("/api/refresh", { method: "POST", credentials: "same-origin" });
+    } catch { /* yoksay */ }
     setTimeout(async () => {
       await refresh();
       btn.disabled = false;

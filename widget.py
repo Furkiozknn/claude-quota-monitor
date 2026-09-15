@@ -24,10 +24,31 @@ import json
 import os
 import subprocess
 import sys
-import tkinter as tk
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+# tkinter modul duzeyinde ice aktarilmiyor: bu dosya yalnizca PALETTE'i okumak
+# icin de import ediliyor (tests/test_consistency.py) ve basliksiz makinede
+# tkinter yok -- modul duzeyindeki import butun test kosusunu dusuruyordu.
+# Yukleme GUI acilirken, Widget kurulurken yapilir.
+tk = None
+
+
+def _tkinter_yukle():
+    """tkinter'i ice aktarip modul genelinde kullanilabilir kilar."""
+    global tk
+    if tk is None:
+        try:
+            import tkinter
+        except ImportError as exc:      # pragma: no cover - ekransiz makine
+            raise SystemExit(
+                "tkinter bulunamadi; widget grafik arayuz gerektiriyor. "
+                "Linux'ta: paket yoneticisinden python3-tk kur. "
+                "Arayuz istemiyorsan panoyu kullan: python server.py"
+            ) from exc
+        tk = tkinter
+    return tk
 
 APP_DIR = Path(__file__).resolve().parent
 SETTINGS = Path.home() / ".claude" / "quota-widget.json"
@@ -100,6 +121,7 @@ class Widget:
         self.cards: list[dict] = []
         self.offline = True
 
+        _tkinter_yukle()
         self.root = tk.Tk()
         self.root.title("Claude Kota")
         self.root.overrideredirect(True)              # cerceve yok

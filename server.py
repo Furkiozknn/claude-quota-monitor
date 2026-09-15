@@ -31,13 +31,14 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 APP_NAME = "claude-quota-monitor"
-APP_VERSION = "0.13.0"   # tests/test_consistency.py PROGRESS.md ile eslestigini dogrular
+APP_VERSION = "0.13.0"   # tek kaynak: baska hicbir dosyada kopyasi yok
 
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
@@ -727,20 +728,83 @@ def make_handler(poller: Poller, conn: sqlite3.Connection):
                 return
 
             if path == "/api/refresh":
-                poller.poke()
-                self._json({"ok": True})
+                # Yan etkili uc: GET degil POST. Bkz. do_POST.
+                self.send_response(405)
+                self.send_header("Allow", "POST")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
                 return
 
             # statik dosyalar
             rel = "index.html" if path in ("/", "") else path.lstrip("/")
             target = (WEB_DIR / rel).resolve()
-            if not str(target).startswith(str(WEB_DIR.resolve())) or not target.is_file():
+            # is_relative_to: duz onek karsilastirmasi kardes klasoru gecirirdi
+            # (WEB_DIR "/x/web" iken "/x/web-yedek" onekle eslesiyordu).
+            if not target.is_relative_to(WEB_DIR.resolve()) or not target.is_file():
                 self._send(404, b"Not found", "text/plain; charset=utf-8")
                 return
             ctype = CONTENT_TYPES.get(target.suffix, "application/octet-stream")
             self._send(200, target.read_bytes(), ctype)
 
+        def do_POST(self) -> None:  # noqa: N802
+            path = self.path.split("?", 1)[0]
+
+            if path != "/api/refresh":
+                self._send(404, b"Not found", "text/plain; charset=utf-8")
+                return
+
+            # Yenileme uca ek sorgu attirir; butce bu projenin merkezinde.
+            # GET oldugu surece kullanicinin actigi HERHANGI bir sayfa
+            # <img src="http://127.0.0.1:8110/api/refresh"> ile bunu dongude
+            # tetikleyebiliyordu. POST + koken dogrulamasi bunu kapatir:
+            # tarayici sayfa-disi POST'a ya Origin koyar (ve biz reddederiz)
+            # ya da CORS on kontrolu ister (ve biz cevaplamayiz).
+            if not self._yerel_kaynakli():
+                self._json({"ok": False, "error": "forbidden"}, 403)
+                return
+
+            poller.poke()
+            self._json({"ok": True})
+
+        def _yerel_kaynakli(self) -> bool:
+            """Istek gercekten bu makinedeki panodan mi geliyor?"""
+            if not _loopback_host(self.headers.get("Host")):
+                return False
+            origin = self.headers.get("Origin")
+            if origin is not None:
+                return _loopback_origin(origin)
+            # Origin yoksa (curl, widget) capraz koken de yoktur: tarayici
+            # capraz kokenli POST'a Origin koymak zorundadir.
+            return True
+
     return Handler
+
+
+LOOPBACK_ADLARI = ("127.0.0.1", "::1", "localhost")
+
+
+def _loopback_host(host: str | None) -> bool:
+    """Host basligi loopback'i mi gosteriyor? ("evil.com", "127.0.0.1.evil.com" hayir)"""
+    if not host:
+        return False
+    try:
+        # "//" onu: urlsplit boylece host:port ve [::1]:port bicimlerini
+        # kendisi cozer — elle ":" bolmek IPv6'yi bozuyor.
+        ad = urllib.parse.urlsplit("//" + host.strip()).hostname
+    except ValueError:
+        return False
+    return (ad or "").lower() in LOOPBACK_ADLARI
+
+
+def _loopback_origin(origin: str) -> bool:
+    """Origin basligi loopback bir http kokenini mi gosteriyor?"""
+    try:
+        parts = urllib.parse.urlsplit(origin)
+    except ValueError:
+        return False
+    if parts.scheme not in ("http", "https"):
+        return False
+    return (parts.hostname or "").lower() in LOOPBACK_ADLARI
 
 
 # --------------------------------------------------------------------------

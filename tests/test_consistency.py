@@ -22,19 +22,21 @@ import server   # noqa: E402
 
 STYLE = (ROOT / "web" / "style.css").read_text(encoding="utf-8")
 INDEX = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
-PROGRESS = (ROOT / "PROGRESS.md").read_text(encoding="utf-8")
 
 
 class TestSurum(unittest.TestCase):
-    """Yasanan hata: APP_VERSION 0.1.0'da donmustu, PROGRESS 0.10.0 diyordu."""
+    """Yasanan hata: APP_VERSION 0.1.0'da donmustu, gunluk 0.10.0 diyordu.
 
-    def test_app_version_progress_ile_ayni(self):
-        m = re.search(r"^### v(\d+\.\d+\.\d+)", PROGRESS, re.M)
-        self.assertIsNotNone(m, "PROGRESS.md'de '### vX.Y.Z' basligi yok")
-        self.assertEqual(
-            server.APP_VERSION, m.group(1),
-            f"server.APP_VERSION={server.APP_VERSION} ama PROGRESS.md'nin en "
-            f"ustteki surumu {m.group(1)}. Ikisini birlikte yukselt.")
+    Gunluk (PROGRESS.md) kaldirildi: otonom calisma notuydu, yerel mutlak
+    yollar ve artik var olmayan dosyalar iceriyordu. Surum artik tek yerde
+    duruyor; karsilastirilacak ikinci kopya kalmadi, karsilastirma testi de
+    kalmadi. Geriye surumun bicimini koruyan kontrol kaliyor.
+    """
+
+    def test_app_version_bicimi(self):
+        self.assertRegex(
+            server.APP_VERSION, r"^\d+\.\d+\.\d+$",
+            f"server.APP_VERSION={server.APP_VERSION} semver bicimde degil")
 
 
 class TestPalet(unittest.TestCase):
