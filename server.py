@@ -45,6 +45,30 @@ CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
 DEFAULT_DB = Path.home() / ".claude" / "quota-monitor.db"
 WEB_DIR = Path(__file__).resolve().parent / "web"
 
+
+def _servilebilir_dosyalar() -> dict[str, Path]:
+    """WEB_DIR altinda servis edilebilecek dosyalarin `adres -> yol` haritasi.
+
+    Her istekte yeniden okunuyor. Klasor bir avuc dosya, ve gelistirirken
+    eklenen bir dosyanin sunucuyu yeniden baslatmadan gorunmesi isteniyor;
+    onbellege alinmasi o davranisi bozardi.
+
+    Sembolik baglantilar eleniyor: `is_file()` onlari izler, o yuzden
+    `resolve()` sonucunun da WEB_DIR altinda kalmasi sart. Boylece
+    `web/disari -> /etc` gibi bir baglanti haritaya hic girmez.
+    """
+    kok = WEB_DIR.resolve()
+    harita: dict[str, Path] = {}
+    if not kok.is_dir():
+        return harita
+    for aday in kok.rglob("*"):
+        if not aday.is_file():
+            continue
+        if not aday.resolve().is_relative_to(kok):
+            continue
+        harita[aday.relative_to(kok).as_posix()] = aday
+    return harita
+
 # Nazik sorgu politikasi
 POLL_INTERVAL = 180          # normal aralik (sn)
 BACKOFF_START = 60           # ilk hata sonrasi bekleme
@@ -735,12 +759,17 @@ def make_handler(poller: Poller, conn: sqlite3.Connection):
                 self.end_headers()
                 return
 
-            # statik dosyalar
+            # Statik dosyalar: istek yolu hicbir zaman bir yol parcasina
+            # cevrilmiyor. WEB_DIR altindaki gercek dosyalarin haritasi
+            # cikariliyor ve istek o haritada ARANIYOR - listede olmayan her
+            # sey 404. Onceki surum (WEB_DIR / rel).resolve() + is_relative_to
+            # ile de dogruydu, ama dogrulugunu hem okuyucunun hem de statik
+            # cozumleyicinin cikarmasi gerekiyordu; CodeQL cikaramadi ve uc
+            # ayri py/path-injection bulgusu acti. Burada cikarilacak bir sey
+            # yok: kullanici girdisi bir anahtar, yol degil.
             rel = "index.html" if path in ("/", "") else path.lstrip("/")
-            target = (WEB_DIR / rel).resolve()
-            # is_relative_to: duz onek karsilastirmasi kardes klasoru gecirirdi
-            # (WEB_DIR "/x/web" iken "/x/web-yedek" onekle eslesiyordu).
-            if not target.is_relative_to(WEB_DIR.resolve()) or not target.is_file():
+            target = _servilebilir_dosyalar().get(rel)
+            if target is None:
                 self._send(404, b"Not found", "text/plain; charset=utf-8")
                 return
             ctype = CONTENT_TYPES.get(target.suffix, "application/octet-stream")
