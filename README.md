@@ -6,6 +6,11 @@ geçmiş grafiği.
 
 Ekranda sürekli yer kaplamaz — istediğinde tarayıcıda açarsın.
 
+> **Not:** Bu proje artık aktif geliştirilmiyor; yerini
+> [claude-code-intelligence](https://github.com/Furkiozknn/claude-code-intelligence)
+> aldı. Buradaki kod çalışır durumda ve kullanılabilir, ama yeni özellikler
+> ve bakım orada sürüyor.
+
 ![Pano — koyu tema](docs/images/pano-koyu.png)
 
 <details>
