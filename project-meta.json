@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "id": "claude-quota-monitor",
+  "owner": "Furkiozknn",
+  "repository": "https://github.com/Furkiozknn/claude-quota-monitor",
+  "homepage": null,
+  "releases": "https://github.com/Furkiozknn/claude-quota-monitor/releases",
+  "status": "archived",
+  "category": "observability",
+  "platform": [
+    "cli",
+    "local-dashboard"
+  ],
+  "primary_language": "Python",
+  "technologies": [
+    "Python",
+    "local web dashboard"
+  ],
+  "version": null,
+  "license": "MIT",
+  "topics": [
+    "archived",
+    "claude-code",
+    "prototype",
+    "python",
+    "quota"
+  ],
+  "summary": "Superseded early prototype of Claude Code quota tracking. The maintained implementation lives in claude-code-intelligence.",
+  "key_features": [
+    "Superseded early prototype of Claude Code quota tracking",
+    "The maintained implementation lives in claude-code-intelligence"
+  ],
+  "media": {
+    "hero": "docs/banner.svg",
+    "screenshots": [
+      "docs/images/pano-koyu.png",
+      "docs/images/pano-acik.png"
+    ],
+    "gifs": [],
+    "videos": []
+  },
+  "tests": {
+    "count": 43,
+    "source": "suite run before archiving",
+    "measured": "2026-09-15"
+  },
+  "ci": {
+    "workflows": [],
+    "badge": null
+  },
+  "docs": {
+    "readme": "README.md",
+    "changelog": null,
+    "version_history": null,
+    "roadmap": null,
+    "security": null,
+    "contributing": null,
+    "license_file": "LICENSE"
+  },
+  "social": {
+    "headline": "Archived prototype - see claude-code-intelligence instead.",
+    "hashtags": [
+      "claudecode",
+      "archived"
+    ],
+    "primary_link": "https://github.com/Furkiozknn/claude-quota-monitor"
+  },
+  "provenance": {
+    "generated_at": "2026-09-22",
+    "generator": "ghcc/gen_meta.py",
+    "rule": "mechanical fields read from the repository and the GitHub API; editorial fields hand-written and reviewed; no field is generated from a guess"
+  }
+}
